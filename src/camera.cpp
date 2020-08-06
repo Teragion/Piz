@@ -49,10 +49,10 @@ void camera_init(camera* cam,
         // bottom
         vec3_init(&n, 0, -1, -1);   // y=-z
         plane3_init(&cam->bt_clip_plane, p0, n); 
-    }
+    } // TODO: handle not simple case
 }
 
-void camera_build_mat(camera* cam) {
+void camera_build_mcam(camera* cam) {
     mat44 mtrans_inv;
     mat44 muvn; // uvn projection matrix 
     mat44 mtmp; 
@@ -82,4 +82,15 @@ void camera_build_mat(camera* cam) {
     mat44_init_col(&muvn, cam->u, cam->v, cam->n); 
 
     mat44_mul(&mtrans_inv, &muvn, &cam->mcam); 
+}
+
+void camera_build_mperspect(camera* cam) {
+    // https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix
+
+    double s = 1.0 / (tan(DEG_TO_RAD(cam->fov/2))); 
+    mat44_init(&cam->mperspect, 
+               s,   0,  0,  0,
+               0,   s/cam->aspect,  0,  0,
+               0,   0,  -cam->far_clip_z/(cam->far_clip_z-cam->near_clip_z), -1,
+               0,   0,  -cam->far_clip_z*cam->near_clip_z/(cam->far_clip_z-cam->near_clip_z), 0);
 }

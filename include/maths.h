@@ -13,4 +13,10 @@
 
 // Functions 
 
+// converts float in range (0, 1) to unsigned char 
+inline unsigned char float_to_uchar(float x) {
+    return (unsigned char)x * 255; 
+}
+
+
 #endif

@@ -55,6 +55,10 @@ struct mat44 {
     }
 };
 
+// constants 
+const mat44 IDENTITY44 = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+
+
 void mat44_init(mat44* ma, 
                 float m00, float m01, float m02, float m03,
                 float m10, float m11, float m12, float m13,
@@ -64,7 +68,8 @@ void mat44_init(mat44* ma,
 void mat44_init_col(mat44* ma, vec4 c1, vec4 c2, vec4 c3); 
 void mat44_init_row(mat44* ma, vec4 r1, vec4 r2, vec4 r3); 
 
-// Assumes last col of matrices are all {0, 0, 0, 1}
 void mat44_mul(mat44* ma, mat44* mb, mat44* mres); 
+
+void mat44_mul(mat44* ma, vec4* v, vec4* vres);
 
 #endif

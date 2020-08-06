@@ -35,6 +35,7 @@ struct camera {
 
     // projection matrices 
     mat44 mcam; 
+    mat44 mperspect;
 };
 
 void camera_init(camera* cam,
@@ -46,6 +47,7 @@ void camera_init(camera* cam,
                  float v_width,
                  float v_height); 
 
-void camera_build_mat(camera* cam); 
+void camera_build_mcam(camera* cam); 
+void camera_build_mperspect(camera* cam); 
 
 #endif 

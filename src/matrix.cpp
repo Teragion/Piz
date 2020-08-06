@@ -33,3 +33,13 @@ void mat44_mul(mat44* ma, mat44* mb, mat44* mres) {
         }
     }
 }
+
+void mat44_mul(mat44* ma, vec4* v, vec4* vres) {
+    for (int r = 0; r < 4; r++) {
+        double sum = 0; 
+        for (int i = 0; i < 4; i++) {
+            sum += *(*ma)(r, i) * v->M[i];
+        }
+        vres->M[r] = (float)sum;
+    }
+}
