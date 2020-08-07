@@ -1,6 +1,7 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
+#include "image.h"
 #include "macros.h"
 #include "vector.h"
 
@@ -18,4 +19,8 @@ void framebuffer_ccolor(framebuffer *fb, vec4 color);
 
 // clear depth buffer
 void framebuffer_cdepth(framebuffer *fb, float depth); 
+
+void blit_bgr(framebuffer *src, image *dst); 
+void blit_rgb(framebuffer *src, image *dst); 
+
 #endif

@@ -34,8 +34,9 @@ struct camera {
     float view_dist; 
 
     // projection matrices 
-    mat44 mcam; 
-    mat44 mperspect;
+    mat44 mcam;         // world to camera
+    mat44 mperspect;    // camera to perspective 
+    mat44 mscr;         // perspective to screen
 };
 
 void camera_init(camera* cam,
@@ -49,5 +50,6 @@ void camera_init(camera* cam,
 
 void camera_build_mcam(camera* cam); 
 void camera_build_mperspect(camera* cam); 
+void camera_build_mscr(camera* cam); 
 
 #endif 

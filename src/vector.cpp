@@ -28,6 +28,14 @@ void vec4_normalize(vec4* v) {
     v->w = 1;
 }
 
+void vec4_divide_by_w(vec4* v) {
+    double w_inv = 1/v->w; 
+    v->x *= w_inv;
+    v->y *= w_inv;    
+    v->z *= w_inv;
+    v->w = 1.0;    
+}
+
 void vec4_cross(vec4* a, vec4* b, vec4* res) {
     res->x =  ( (a->y * b->z) - (a->z * b->y) );
     res->y = -( (a->x * b->z) - (a->z * b->x) );

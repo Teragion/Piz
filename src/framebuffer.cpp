@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "framebuffer.h"
+#include "macros.h"
 #include "maths.h"
 
 framebuffer* framebuffer_create(int width, int height) {
@@ -15,6 +16,8 @@ framebuffer* framebuffer_create(int width, int height) {
     float default_depth = 1.0; 
 
     framebuffer* fb = (framebuffer*)malloc(sizeof(framebuffer)); 
+    if (fb == NULL)
+        return NULL;
     fb->width = width; 
     fb->height = height; 
     fb->color_buffer = (unsigned char*)malloc(cbuffer_size); 
@@ -49,7 +52,49 @@ void framebuffer_ccolor(framebuffer *fb, vec4 color) {
 
 void framebuffer_cdepth(framebuffer *fb, float depth) {
     uint bsize = fb->width * fb->height;
-    for(uint i = 0; i < bsize; i++) {
-        std::fill_n(fb->depth_buffer, bsize, depth);
-    } 
+    std::fill(fb->depth_buffer, fb->depth_buffer + bsize, depth);
+}
+
+void blit_bgr(framebuffer *src, image *dst) {
+    int width = dst->width;
+    int height = dst->height;
+    int r, c;
+
+    assert(src->width == dst->width && src->height == dst->height);
+    assert(dst->fmt == FORMAT_LDR && dst->channels == 4);
+
+    for (r = 0; r < height; r++) {
+        for (c = 0; c < width; c++) {
+            int flipped_r = height - 1 - r;
+            int src_index = (r * width + c) * 4;
+            int dst_index = (flipped_r * width + c) * 4;
+            unsigned char *src_pixel = &src->color_buffer[src_index];
+            unsigned char *dst_pixel = &dst->ldr_buffer[dst_index];
+            dst_pixel[0] = src_pixel[2];  /* blue */
+            dst_pixel[1] = src_pixel[1];  /* green */
+            dst_pixel[2] = src_pixel[0];  /* red */
+        }
+    }
+}
+
+void blit_rgb(framebuffer *src, image *dst) {
+    int width = dst->width;
+    int height = dst->height;
+    int r, c;
+
+    assert(src->width == dst->width && src->height == dst->height);
+    assert(dst->fmt == FORMAT_LDR && dst->channels == 4);
+
+    for (r = 0; r < height; r++) {
+        for (c = 0; c < width; c++) {
+            int flipped_r = height - 1 - r;
+            int src_index = (r * width + c) * 4;
+            int dst_index = (flipped_r * width + c) * 4;
+            unsigned char *src_pixel = &src->color_buffer[src_index];
+            unsigned char *dst_pixel = &dst->ldr_buffer[dst_index];
+            dst_pixel[0] = src_pixel[0];  /* red */
+            dst_pixel[1] = src_pixel[1];  /* green */
+            dst_pixel[2] = src_pixel[2];  /* blue */
+        }
+    }
 }

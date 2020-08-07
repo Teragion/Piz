@@ -1,3 +1,6 @@
+#include <cmath>
+
+#include "macros.h"
 #include "matrix.h"
 #include "vector.h"
 
@@ -22,6 +25,61 @@ void mat44_init_col(mat44* ma, vec4 c1, vec4 c2, vec4 c3) {
                0,       0,      0,      1);
 }
 
+void mat44_rotate_x(mat44* ma, float theta_x) {
+    float s = sin(theta_x);
+    float c = cos(theta_x);
+
+    mat44_init(ma, 
+               1,   0,  0,  0,
+               0,   c, -s,  0,
+               0,   s,  c,  0,
+               0,   0,  0,  1);
+}
+
+void mat44_rotate_y(mat44* ma, float theta_y) {
+    float s = sin(theta_y);
+    float c = cos(theta_y);
+
+    mat44_init(ma, 
+               c,   0,  s,  0,
+               0,   1,  0,  0,
+              -s,   0,  c,  0,
+               0,   0,  0,  1);
+}
+
+void mat44_rotate_z(mat44* ma, float theta_z) {
+    float s = sin(theta_z);
+    float c = cos(theta_z);
+
+    mat44_init(ma, 
+               c,  -s,  0,  0,
+               s,   c,  0,  0,
+               0,   0,  1,  0,
+               0,   0,  0,  1);
+}
+
+void mat44_rotate_xyz(mat44* ma, float theta_x, float theta_y, float theta_z) {
+    mat44 mx, my, mz, mtmp; 
+    float sin_theta = 0, cos_theta = 0;
+    int rot_seq = 0; // x : 1
+                     // y : 2
+                     // z : 4
+
+    *ma = IDENTITY44; 
+
+    // determine rotation sequence 
+    if (abs(theta_x) > EPSI_E5) 
+        rot_seq = rot_seq | 1;
+
+    if (abs(theta_y) > EPSI_E5)
+        rot_seq = rot_seq | 2; 
+    
+    if (abs(theta_z) > EPSI_E5)
+        rot_seq = rot_seq | 4;
+
+    
+}
+
 void mat44_mul(mat44* ma, mat44* mb, mat44* mres) {
     for (int r = 0; r < 4; r++) {
         for (int c = 0; c < 4; c++) {
@@ -34,12 +92,13 @@ void mat44_mul(mat44* ma, mat44* mb, mat44* mres) {
     }
 }
 
+// currently using row vectors 
 void mat44_mul(mat44* ma, vec4* v, vec4* vres) {
-    for (int r = 0; r < 4; r++) {
+    for (int c = 0; c < 4; c++) {
         double sum = 0; 
         for (int i = 0; i < 4; i++) {
-            sum += *(*ma)(r, i) * v->M[i];
+            sum += *(*ma)(i, c) * v->M[i];
         }
-        vres->M[r] = (float)sum;
+        vres->M[c] = (float)sum;
     }
 }

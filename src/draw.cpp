@@ -3,6 +3,16 @@
 #include "draw.h"
 #include "maths.h"
 
+static void swap_int(int *a, int *b) {
+    int t = *a;
+    *a = *b; 
+    *b = t; 
+}
+
+static inline int lerp_int(int a, int b, float t) {
+    return (a + (b - a) * t);
+}
+
 void draw_point(int x, int y, unsigned char color[4], framebuffer* fb) {
     int index = (y * fb->width + x) * 4;
     for (int i = 0; i < 4; i++) {
@@ -11,11 +21,33 @@ void draw_point(int x, int y, unsigned char color[4], framebuffer* fb) {
 }
 
 void draw_line(int x1, int y1, int x2, int y2, unsigned char color[4], framebuffer* fb) {
+    // Bresenham's line algorithm 
+
     int x_dist = abs(x2 - x1);
     int y_dist = abs(y2 - y1);
-    if (x_dist == 0 && y_dist == 0) 
+    if (x_dist == 0 && y_dist == 0) {
         draw_point(x1, y1, color, fb);
-
+    } else if (x_dist > y_dist) {
+        if (x1 > x2) {
+            swap_int(&x1, &x2);
+            swap_int(&y1, &y2);
+        }
+        for (int x = x1; x <= x2; x++) {
+            float t = (float)(x - x1) / (float)x_dist;
+            int y = lerp_int(y1, y2, t);
+            draw_point(x, y, color, fb);
+        }
+    } else {
+        if (y1 > y2) {
+            swap_int(&x1, &x2);
+            swap_int(&y1, &y2);
+        }
+        for (int y = y1; y <= y2; y++) {
+            float t = (float)(y - y1) / (float)y_dist;
+            int x = lerp_int(x1, x2, t);
+            draw_point(x, y, color, fb);
+        }
+    }
 }
 
 void draw_clip_line(int x1, int y1, int x2, int y2, unsigned char color[4], framebuffer* fb) {
@@ -31,6 +63,10 @@ void draw_clip_line(int x1, int y1, int x2, int y2, unsigned char color[4], fram
     // clip the line
     if (clip_line(cxs, cys, cxe, cye, fb))
         draw_line(cxs, cys, cxe, cye, color, fb);
+}
+
+void draw_clip_line(vec4 p1, vec4 p2, unsigned char color[4], framebuffer *fb) {
+    draw_clip_line(p1.x, p1.y, p2.x, p2.y, color, fb);
 }
 
 int clip_line(int &x1, int &y1, int &x2, int &y2, framebuffer* fb) {
@@ -302,5 +338,12 @@ int clip_line(int &x1, int &y1, int &x2, int &y2, framebuffer* fb) {
     y2 = yc2;
 
     return(1);
-
 } 
+
+void draw_object_wireframe(obj *o, unsigned char color[4], framebuffer* fb) {
+    for (auto it = o->plist.begin(); it != o->plist.end(); it++) {
+        for (int i = 0; i < it->num_vertices; i++) {
+            draw_clip_line(o->vlist_trans[it->vlist[i]], o->vlist_trans[it->vlist[(i + 1) % it->num_vertices]], color, fb);
+        }
+    }
+}

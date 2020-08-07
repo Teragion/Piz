@@ -85,12 +85,24 @@ void camera_build_mcam(camera* cam) {
 }
 
 void camera_build_mperspect(camera* cam) {
-    // https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix
-
-    double s = 1.0 / (tan(DEG_TO_RAD(cam->fov/2))); 
+    // guru p.697
     mat44_init(&cam->mperspect, 
-               s,   0,  0,  0,
-               0,   s/cam->aspect,  0,  0,
-               0,   0,  -cam->far_clip_z/(cam->far_clip_z-cam->near_clip_z), -1,
-               0,   0,  -cam->far_clip_z*cam->near_clip_z/(cam->far_clip_z-cam->near_clip_z), 0);
+               cam->view_dist,   0,  0,  0,
+               0,   cam->view_dist*cam->aspect,  0,  0,
+               0,   0,  1,  1,
+               0,   0,  0,  0);
+}
+
+void camera_build_mscr(camera* cam) {
+    // guru p. 704
+    // note: apply convert from homogenous 4d first 
+
+    float alpha = 0.5 * cam->viewport_width - 0.5;
+    float beta = 0.5 * cam->viewport_height - 0.5; 
+
+    mat44_init(&cam->mscr, 
+               alpha,   0,  0,  0,
+               0,   -beta,  0,  0,
+               alpha,   beta,   1,  0,
+               0,   0,  0,  1);
 }

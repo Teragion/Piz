@@ -76,6 +76,8 @@ inline void vec4_sub(vec4* a, vec4* b) {
 // normalize first 3 elements of v 
 void vec4_normalize(vec4* v);
 
+void vec4_divide_by_w(vec4* v);
+
 // res = a x b (as vec3)
 void vec4_cross(vec4* a, vec4* b, vec4* res);
 

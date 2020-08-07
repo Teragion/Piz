@@ -5,7 +5,9 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(HEADERS 
     include/camera.h
+    include/draw.h
     include/framebuffer.h
+    include/image.h
     include/loader.h
     include/macros.h
     include/maths.h
@@ -14,13 +16,18 @@ set(HEADERS
     include/plane.h
     include/platform.h
     include/polygon.h
+    include/program.h
     include/vector.h
 )
 
 set(SOURCES 
     src/camera.cpp
     src/demo.cpp
+    src/draw.cpp
+    src/framebuffer.cpp
+    src/image.cpp
     src/matrix.cpp
+    src/object.cpp
     src/plane.cpp
     src/vector.cpp
 )

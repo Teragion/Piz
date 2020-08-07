@@ -27,16 +27,32 @@ void obj::calc_max_avg_radius() {
     avg_radius /= num_vertices;
 }
 
-void obj::trans_vlist(mat44 m, trans_mode mode) {
+mat44 obj::build_trans_mat() {
+    mat44 ret = IDENTITY44;
+    
+    *ret(0, 3) = pos.x;
+    *ret(1, 3) = pos.y;
+    *ret(2, 3) = pos.z;
+
+    return ret; 
+}
+
+void obj::convert_from_homogenous4d() {
+    for (auto it = vlist_trans.begin(); it != vlist_trans.end(); it++) {
+        vec4_divide_by_w(&*it);
+    }
+}
+
+void obj::trans_vlist(mat44 *m, trans_mode mode) {
     vec4 tmp; 
     for (uint i = 0; i < num_vertices; i++) {
         switch(mode) {
             case LOCAL_ONLY:
             case LOCAL_TO_TRANS:
-                mat44_mul(&m, &vlist_local[i], &tmp);
+                mat44_mul(m, &vlist_local[i], &tmp);
                 break;
             case TRANS_ONLY:
-                mat44_mul(&m, &vlist_trans[i], &tmp);
+                mat44_mul(m, &vlist_trans[i], &tmp);
                 break;
         }
         switch(mode) {
@@ -49,14 +65,4 @@ void obj::trans_vlist(mat44 m, trans_mode mode) {
                 break;
         }
     }
-}
-
-mat44 obj::build_trans_mat() {
-    mat44 ret = IDENTITY44;
-    
-    *ret(3, 0) = pos.x;
-    *ret(3, 1) = pos.y;
-    *ret(3, 2) = pos.z;
-
-    return ret; 
 }

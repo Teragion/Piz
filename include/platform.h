@@ -11,20 +11,22 @@ void platform_init();
 void platform_term(); 
 
 // window controls 
-window_t window_create(const char *title, int width, int height); 
+window_t* window_create(const char *title, int width, int height); 
 void window_destroy(window_t *window);
 // void window_set_userdata(window_t *window, void *userdata);
 // void *window_get_userdata(window_t *window);
 void window_draw_buffer(window_t *window, framebuffer *buffer); 
 
+int window_should_close(window_t *window);
+
 // input events 
-void input_poll_events(void);
+void input_poll_events();
 int input_key_pressed(window_t *window, keycode_t key);
 // int input_button_pressed(window_t *window, button_t button);
 void input_query_cursor(window_t *window, float *xpos, float *ypos);
 // void input_set_callbacks(window_t *window, callbacks_t callbacks);
 
 // misc platform functions
-// float platform_get_time(void);
+float platform_get_time();
 
 #endif

@@ -33,8 +33,11 @@ struct obj {
     void add_vert(vec4 v);
     void add_poly(polygon p);
     void calc_max_avg_radius();
-    void trans_vlist(mat44 m, trans_mode mode);
+
     mat44 build_trans_mat();
+
+    void convert_from_homogenous4d();
+    void trans_vlist(mat44 *m, trans_mode mode);
 };
 
 #endif 

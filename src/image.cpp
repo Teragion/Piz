@@ -19,20 +19,22 @@ image *image_create(uint width, uint height, uint channels, format fmt) {
     img->ldr_buffer = NULL;
     img->hdr_buffer = NULL; 
 
+    uint size; 
     switch (fmt) {
     case FORMAT_LDR:
-        uint size = sizeof(unsigned char) * num_elems; 
+        size = sizeof(unsigned char) * num_elems; 
         img->ldr_buffer = (unsigned char*) malloc(size);
         break;
     
     case FORMAT_HDR:
-        uint size = sizeof(float) * num_elems;
+        size = sizeof(float) * num_elems;
         img->hdr_buffer = (float*) malloc(size);
         break;
 
     default:
         break;
     }
+    return img;
 }
 
 void image_release(image *img) {

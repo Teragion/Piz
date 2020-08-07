@@ -66,10 +66,15 @@ void mat44_init(mat44* ma,
                 float m30, float m31, float m32, float m33);
 
 void mat44_init_col(mat44* ma, vec4 c1, vec4 c2, vec4 c3); 
-void mat44_init_row(mat44* ma, vec4 r1, vec4 r2, vec4 r3); 
+// void mat44_init_row(mat44* ma, vec4 r1, vec4 r2, vec4 r3); 
+void mat44_rotate_x(mat44* ma, float theta_x);
+void mat44_rotate_y(mat44* ma, float theta_y);
+void mat44_rotate_z(mat44* ma, float theta_z);
+void mat44_rotate_xyz(mat44* ma, float theta_x, float theta_y, float theta_z);
 
 void mat44_mul(mat44* ma, mat44* mb, mat44* mres); 
 
 void mat44_mul(mat44* ma, vec4* v, vec4* vres);
+
 
 #endif
