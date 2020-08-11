@@ -30,9 +30,9 @@ void obj::calc_max_avg_radius() {
 mat44 obj::build_trans_mat() {
     mat44 ret = IDENTITY44;
     
-    *ret(0, 3) = pos.x;
-    *ret(1, 3) = pos.y;
-    *ret(2, 3) = pos.z;
+    *ret(3, 0) = pos.x;
+    *ret(3, 1) = pos.y;
+    *ret(3, 2) = pos.z;
 
     return ret; 
 }

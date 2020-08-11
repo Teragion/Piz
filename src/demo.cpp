@@ -11,8 +11,44 @@
 
 using namespace std; 
 
+vec4 dv; 
 camera cam; 
 vector<obj> obj_list; 
+
+void keybd_callback(window_t *window, keycode key, int pressed) {
+	switch (key) {
+		case KEY_A:
+			if (pressed) {
+				dv.x = -0.1; 
+			} else {
+				dv.x = 0; 
+			}
+			break; 
+		case KEY_D:
+			if (pressed) {
+				dv.x = 0.1; 
+			} else {
+				dv.x = 0; 
+			}
+			break; 
+		case KEY_W:
+			if (pressed) {
+				dv.z = 0.1; 
+			} else {
+				dv.z = 0; 
+			}
+			break; 
+		case KEY_S:
+			if (pressed) {
+				dv.z = -0.1; 
+			} else {
+				dv.z = 0; 
+			}
+			break; 
+		default: 
+			break; 
+	}
+}
 
 void main_loop(window_t *window) {
 	printf("entered main loop.\n");
@@ -25,6 +61,7 @@ void main_loop(window_t *window) {
 	while (!window_should_close(window)) {
 		float cur_time = platform_get_time(); 
 		float delta_time = cur_time - prev_time; 
+		vec4_add(&cam.pos, &dv);
 
 		framebuffer_ccolor(fb, {0, 0.1, 0.3, 0}); // fill buffer with some color
 
@@ -69,14 +106,18 @@ int main() {
 	printf("init complete.\n");
 	window_t *window = window_create("demo", 1280, 720); 
 	printf("window created.\n");
+	callbacks *callback_list = (callbacks*)malloc(sizeof(callbacks)); 
+	callback_list->keybd_callback = keybd_callback; 
+	input_set_callbacks(window, *callback_list);
+	printf("callbacks binded.\n");
 	// -------------- Scene Setup -------------- 
 	obj trig; 
 	trig.num_polygons = 0;
 	trig.num_vertices = 0;
-	trig.pos = {50, 0, 0, 1};
-	trig.add_vert({20, 0, 0, 1});
+	trig.pos = {0, 0, 50, 1};
 	trig.add_vert({0, 20, 0, 1});
-	trig.add_vert({0, 0, 20, 1});
+	trig.add_vert({20, 0, 0, 1});
+	trig.add_vert({0, 0,  0, 1});
 
 	polygon p1; 
 	p1.num_vertices = 3;
@@ -85,7 +126,7 @@ int main() {
 	trig.add_poly(p1);
 	obj_list.push_back(trig);
 
-	camera_init(&cam, {-50, 0, 0, 1}, {1, 0, 0, 1}, 50, 500, 90, 1280, 720);
+	camera_init(&cam, {0, 0, -50, 1}, {0, 0, 1, 1}, 50, 500, 90, 1280, 720);
 	printf("scene created.\n");
 	// -------------- Scene Setup -------------- 
 	main_loop(window);

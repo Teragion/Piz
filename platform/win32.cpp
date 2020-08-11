@@ -13,8 +13,8 @@ struct window {
     /* common data */
     int should_close;
     char keys[KEY_NUM];
-    // char buttons[BUTTON_NUM];
-    // callbacks callback_list;
+    char mbuttons[MOUSE_NUM];
+    callbacks callback_list;
     void* userdata;
 }; 
 
@@ -22,6 +22,29 @@ static int global_init = 0;
 static double initial_time; 
 
 static double get_native_time();
+
+/*
+ * for virtual-key codes, see
+ * https://docs.microsoft.com/en-us/windows/desktop/inputdev/virtual-key-codes
+ */
+static void handle_key_message(window_t *window, WPARAM virtual_key, char pressed) {
+    keycode key; 
+    switch (virtual_key) {
+        case 'A':       key = KEY_A;        break;
+        case 'D':       key = KEY_D;        break;
+        case 'S':       key = KEY_S;        break;
+        case 'W':       key = KEY_W;        break;
+        case VK_SPACE:  key = KEY_SPACE;    break;
+        default:        key = KEY_NUM;      break;
+    }
+
+    if (key < KEY_NUM) {
+        window->keys[key] = pressed; 
+        if (window->callback_list.keybd_callback) {
+            window->callback_list.keybd_callback(window, key, pressed);
+        }
+    }
+}
 
 #ifdef UNICODE
     static const wchar_t* const WINDOW_CLASS_NAME = L"Piz_Demo";
@@ -41,10 +64,10 @@ static LRESULT CALLBACK process_message(HWND hwnd, UINT uMsg,
         window->should_close = 1;
         return 0;
     } else if (uMsg == WM_KEYDOWN) {
-        // add key handlings 
+        handle_key_message(window, wParam, 1);
         return 0; 
     } else if (uMsg == WM_KEYUP) {
-        // add key handlings 
+        handle_key_message(window, wParam, 0);
         return 0;
     } else if (uMsg == WM_LBUTTONDOWN) {
         // add mouse handlings 
@@ -235,10 +258,14 @@ void input_poll_events() {
     }
 }
 
-int input_key_pressed(window_t *window, keycode_t key);
+// keyboard related 
+
+int input_key_pressed(window_t *window, keycode key);
 // int input_button_pressed(window_t *window, button_t button);
 void input_query_cursor(window_t *window, float *xpos, float *ypos);
-// void input_set_callbacks(window_t *window, callbacks_t callbacks);
+void input_set_callbacks(window_t *window, callbacks callback_list) {
+    window->callback_list = callback_list;
+}
 
 // private data 
 int window_should_close(window_t *window) {
