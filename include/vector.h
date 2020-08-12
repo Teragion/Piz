@@ -43,6 +43,8 @@ struct vec4 {
 
 typedef vec4 point4; 
 
+// TODO: make some pointers const 
+
 inline void vec3_init(vec3* v, float x, float y, float z) {
     v->x = x; v->y = y; v->z = z;
 }
@@ -80,6 +82,7 @@ void vec4_divide_by_w(vec4* v);
 
 // res = a x b (as vec3)
 void vec4_cross(vec4* a, vec4* b, vec4* res);
+double vec4_dot(vec4* a, vec4* b); 
 
 
 #endif 

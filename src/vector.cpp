@@ -42,3 +42,11 @@ void vec4_cross(vec4* a, vec4* b, vec4* res) {
     res->z =  ( (a->x * b->y) - (a->y * b->x) ); 
     res->w = 1;
 }
+
+double vec4_dot(vec4* a, vec4* b) {
+    double ret = 0.0; 
+    for (int i = 0; i < 4; i++) {
+        ret += a->M[i] * b->M[i]; 
+    }
+    return ret; 
+}

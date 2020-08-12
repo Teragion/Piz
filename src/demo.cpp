@@ -13,7 +13,7 @@ using namespace std;
 
 vec4 dv; 
 camera cam; 
-vector<obj> obj_list; 
+vector<trig_mesh> obj_list; 
 
 void keybd_callback(window_t *window, keycode key, int pressed) {
 	switch (key) {
@@ -111,7 +111,7 @@ int main() {
 	input_set_callbacks(window, *callback_list);
 	printf("callbacks binded.\n");
 	// -------------- Scene Setup -------------- 
-	obj trig; 
+	trig_mesh trig; 
 	trig.num_polygons = 0;
 	trig.num_vertices = 0;
 	trig.pos = {0, 0, 50, 1};
@@ -119,11 +119,7 @@ int main() {
 	trig.add_vert({20, 0, 0, 1});
 	trig.add_vert({0, 0,  0, 1});
 
-	polygon p1; 
-	p1.num_vertices = 3;
-	p1.vlist = {0, 1, 2};
-
-	trig.add_poly(p1);
+	trig.add_trig(0, 1, 2);
 	obj_list.push_back(trig);
 
 	camera_init(&cam, {0, 0, -50, 1}, {0, 0, 1, 1}, 50, 500, 90, 1280, 720);

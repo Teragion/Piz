@@ -2,18 +2,33 @@
 
 #include "object.h"
 
-void obj::add_vert(vec4 v) {
+void polyhed::add_vert(vec4 v) {
     num_vertices++;
     vlist_local.push_back(v);
     vlist_trans.push_back(v);
 }
 
-void obj::add_poly(polygon p) {
+void trig_mesh::add_trig(int v0, int v1, int v2) {
+    // std::unique_ptr<trig> t = std::make_unique<trig>();
+    trig *t = (trig*)malloc(sizeof(trig)); 
+    t->num_vertices = 3;
+    t->v0_local = &vlist_local[v0];
+    t->v1_local = &vlist_local[v1];
+    t->v2_local = &vlist_local[v2];    
+    t->v0_trans = &vlist_trans[v0];
+    t->v1_trans = &vlist_trans[v1];
+    t->v2_trans = &vlist_trans[v2];
+    num_polygons++; 
+    tlist.push_back(t); 
+}
+
+void polyhed::add_poly(polygon *p) {
     num_polygons++;
+    // plist.push_back(std::make_unique<polygon>(*p));
     plist.push_back(p);
 }
 
-void obj::calc_max_avg_radius() {
+void polyhed::calc_max_avg_radius() {
     max_radius = 0;
     avg_radius = 0;
 
@@ -37,13 +52,13 @@ mat44 obj::build_trans_mat() {
     return ret; 
 }
 
-void obj::convert_from_homogenous4d() {
+void polyhed::convert_from_homogenous4d() {
     for (auto it = vlist_trans.begin(); it != vlist_trans.end(); it++) {
         vec4_divide_by_w(&*it);
     }
 }
 
-void obj::trans_vlist(mat44 *m, trans_mode mode) {
+void polyhed::trans_vlist(mat44 *m, trans_mode mode) {
     vec4 tmp; 
     for (uint i = 0; i < num_vertices; i++) {
         switch(mode) {

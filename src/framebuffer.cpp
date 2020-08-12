@@ -65,9 +65,9 @@ void blit_bgr(framebuffer *src, image *dst) {
 
     for (r = 0; r < height; r++) {
         for (c = 0; c < width; c++) {
-            int flipped_r = height - 1 - r;
+            // int flipped_r = height - 1 - r;
             int src_index = (r * width + c) * 4;
-            int dst_index = (flipped_r * width + c) * 4;
+            int dst_index = (r * width + c) * 4;
             unsigned char *src_pixel = &src->color_buffer[src_index];
             unsigned char *dst_pixel = &dst->ldr_buffer[dst_index];
             dst_pixel[0] = src_pixel[2];  /* blue */
@@ -87,9 +87,9 @@ void blit_rgb(framebuffer *src, image *dst) {
 
     for (r = 0; r < height; r++) {
         for (c = 0; c < width; c++) {
-            int flipped_r = height - 1 - r;
+            // int flipped_r = height - 1 - r;
             int src_index = (r * width + c) * 4;
-            int dst_index = (flipped_r * width + c) * 4;
+            int dst_index = (r * width + c) * 4;
             unsigned char *src_pixel = &src->color_buffer[src_index];
             unsigned char *dst_pixel = &dst->ldr_buffer[dst_index];
             dst_pixel[0] = src_pixel[0];  /* red */

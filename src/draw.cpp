@@ -340,10 +340,10 @@ int clip_line(int &x1, int &y1, int &x2, int &y2, framebuffer* fb) {
     return(1);
 } 
 
-void draw_object_wireframe(obj *o, unsigned char color[4], framebuffer* fb) {
+void draw_polyhed_wireframe(polyhed *o, unsigned char color[4], framebuffer* fb) {
     for (auto it = o->plist.begin(); it != o->plist.end(); it++) {
-        for (int i = 0; i < it->num_vertices; i++) {
-            draw_clip_line(o->vlist_trans[it->vlist[i]], o->vlist_trans[it->vlist[(i + 1) % it->num_vertices]], color, fb);
+        for (int i = 0; i < (*it)->num_vertices; i++) {
+            draw_clip_line(o->vlist_trans[(*it)->vlist[i]], o->vlist_trans[(*it)->vlist[(i + 1) % (*it)->num_vertices]], color, fb);
         }
     }
 }
