@@ -1,5 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "image.h"
 
@@ -44,7 +46,13 @@ void image_release(image *img) {
 }
 
 image *image_load(const char *filename);
-void image_save(image *img, const char *filename);
+
+static void save_tga_image(image *image, const char *filename);
+
+void image_save(image *img, const char *filename) {
+    if (img->fmt == FORMAT_LDR)
+        save_tga_image(img, filename);
+}
 
 /* image processing */
 
@@ -116,3 +124,53 @@ void image_flip_v(image *img) {
     }
 }
 
+// TGA related
+// https://github.com/zauonlok/renderer/blob/master/renderer/core/image.c
+
+#define TGA_HEADER_SIZE 18
+
+static void write_bytes(FILE *file, void *buffer, int size) {
+    int count = (int)fwrite(buffer, 1, size, file);
+    assert(count == size);
+    (void)(count);
+}
+
+static int get_num_elems(image *image) {
+    return image->width * image->height * image->channels;
+}
+
+static void save_tga_image(image *image, const char *filename) {
+    unsigned char header[TGA_HEADER_SIZE];
+    FILE *file;
+
+    assert(image->fmt == FORMAT_LDR);
+
+    file = fopen(filename, "wb");
+    assert(file != NULL);
+
+    memset(header, 0, TGA_HEADER_SIZE);
+    header[2] = image->channels == 1 ? 3 : 2;               /* image type */
+    header[12] = image->width & 0xFF;                       /* width, lsb */
+    header[13] = (image->width >> 8) & 0xFF;                /* width, msb */
+    header[14] = image->height & 0xFF;                      /* height, lsb */
+    header[15] = (image->height >> 8) & 0xFF;               /* height, msb */
+    header[16] = (image->channels * 8) & 0xFF;              /* image depth */
+    write_bytes(file, header, TGA_HEADER_SIZE);
+
+    if (image->channels >= 3) {
+        int r, c;
+        for (r = 0; r < image->height; r++) {
+            for (c = 0; c < image->width; c++) {
+                unsigned char *pixel = get_ldr_pixel(image, r, c);
+                unsigned char channels[4];
+                memcpy(channels, pixel, image->channels);
+                swap_bytes(&channels[0], &channels[2]);     /* rgb to bgr */
+                write_bytes(file, channels, image->channels);
+            }
+        }
+    } else {
+        write_bytes(file, image->ldr_buffer, get_num_elems(image));
+    }
+
+    fclose(file);
+}

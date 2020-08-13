@@ -8,11 +8,13 @@ set(HEADERS
     include/draw.h
     include/framebuffer.h
     include/image.h
+    include/light.h
     include/loader.h
     include/macros.h
     include/maths.h
     include/matrix.h
     include/object.h
+    include/pathtracer.h
     include/plane.h
     include/platform.h
     include/polygon.h
@@ -22,12 +24,13 @@ set(HEADERS
 
 set(SOURCES 
     src/camera.cpp
-    src/demo.cpp
     src/draw.cpp
     src/framebuffer.cpp
     src/image.cpp
+    src/maths.cpp
     src/matrix.cpp
     src/object.cpp
+    src/pathtracer.cpp
     src/plane.cpp
     src/vector.cpp
 )
@@ -40,18 +43,28 @@ endif()
 # DEMO
 # ==========================
 
-set(TARGET Demo)
+add_library(common INTERFACE)
 
-add_executable(${TARGET} ${HEADERS} ${SOURCES})
+# set(TARGET Demo_Interactive Demo_PathTracer)
 
-target_include_directories(Demo PUBLIC include)
+add_executable(Demo_Interactive ${HEADERS} ${SOURCES} src/demo.cpp)
+add_executable(Demo_PathTracer ${HEADERS} ${SOURCES} src/demo_pathtracer.cpp)
+
+target_include_directories(Demo_Interactive PUBLIC include)
+target_include_directories(Demo_PathTracer PUBLIC include)
 
 # ==========================
 # Compile options
 # ==========================
 
+if(MSVC)
+    target_compile_options(common INTERFACE /fp:fast)
+endif()
+
 # ==========================
 # Link libraries
 # ==========================
 
+target_link_libraries(Demo_Interactive common)
+target_link_libraries(Demo_PathTracer common)
 # target_compile_options(example PUBLIC -std=c++1y -Wall -Wfloat-conversion)

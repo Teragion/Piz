@@ -25,6 +25,15 @@ void mat44_init_col(mat44* ma, vec4 c1, vec4 c2, vec4 c3) {
                0,       0,      0,      1);
 }
 
+
+void mat44_init_row(mat44* ma, vec4 c1, vec4 c2, vec4 c3) {
+    mat44_init(ma,
+               c1.x,    c1.y,   c1.z,   0,
+               c2.x,    c2.y,   c2.z,   0,
+               c3.x,    c3.y,   c3.z,   0,
+               0,       0,      0,      1);
+}
+
 void mat44_rotate_x(mat44* ma, float theta_x) {
     float s = sin(theta_x);
     float c = cos(theta_x);

@@ -13,6 +13,17 @@ static inline int lerp_int(int a, int b, float t) {
     return (a + (b - a) * t);
 }
 
+unsigned char proc[4];
+
+void draw_point(int x, int y, color c, framebuffer* fb) {
+    proc[0] = c.x * 255;
+    proc[1] = c.y * 255;    
+    proc[2] = c.z * 255;
+    proc[3] = 0;
+
+    draw_point(x, y, proc, fb);
+}
+
 void draw_point(int x, int y, unsigned char color[4], framebuffer* fb) {
     int index = (y * fb->width + x) * 4;
     for (int i = 0; i < 4; i++) {

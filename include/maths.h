@@ -2,6 +2,7 @@
 #define MATHS_H
 
 #include <limits>
+#include <random> 
 #include <vector>
 
 #include "macros.h"
@@ -20,22 +21,7 @@
 // Functions 
 
 // returns true if real solutions exist 
-bool quadratic_solve(double a, double b, double c, float &x0, float &x1) {
-    float discr = b * b - 4 * a * c; 
-    if (discr < 0) return false; 
-    else if (discr == 0) { 
-        x0 = x1 = - 0.5 * b / a; 
-    } 
-    else { 
-        float q = (b > 0) ? 
-            -0.5 * (b + sqrt(discr)) : 
-            -0.5 * (b - sqrt(discr)); 
-        x0 = q / a; 
-        x1 = c / q; 
-    } 
- 
-    return true; 
-}
+bool quadratic_solve(double a, double b, double c, float &x0, float &x1);
 
 // TODO: use sin/cos lookup tables to speedup computation. Actually, 
 //       check if it actually increases performance 
@@ -59,9 +45,7 @@ struct isect {
     uint trig_index; 
 };
 
-void isect_init(isect &i) {
-    i.inear = std::numeric_limits<float>::max(); 
-}
+void isect_init(isect &i);
 
 // returns true if intersection detected
 bool ray_sphere_intersect(ray *r, sphere *s, float &inear);
@@ -73,6 +57,33 @@ bool ray_trig_intersect(ray *r, const trig *trig, float &inear, float &u, float 
 bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint trig_index);
 
 // trace light for all objects (only type = SPHERE||TRIG_MESH)
-bool trace(ray *r, std::vector<obj*> obj_list, isect &res);
+bool trace(ray *r, std::vector<obj*> &obj_list, isect &res);
+
+// random related 
+extern std::default_random_engine generator;
+extern std::uniform_real_distribution<float> dist01;
+
+void random_init(uint seed = RANDOM_SEED); 
+
+inline float random01() {
+    return dist01(generator);
+}
+
+/** generate spherically uniform vector and return direction vector in xyz coord 
+ * TODO: study the sampling algorithm!
+ * https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
+ & @param r1 random number (0, 1)
+ & @param r2 random number (0, 1)
+ */
+vec4 uniform_sample_hemis(const float &r1, const float &r2);
+
+/** 
+ * generates a matrix that transforms the vector generated in uniform_sample_hemis
+ * from sample coord to world coord. 
+ * @param N normal vector 
+ */
+mat44 create_sample_coord(const vec4 &N);
+
+
 
 #endif

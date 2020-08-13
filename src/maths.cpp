@@ -1,9 +1,25 @@
 #include "maths.h"
 
+bool quadratic_solve(double a, double b, double c, float &x0, float &x1) {
+    float discr = b * b - 4 * a * c; 
+    if (discr < 0) return false; 
+    else if (discr == 0) { 
+        x0 = x1 = - 0.5 * b / a; 
+    } 
+    else { 
+        float q = (b > 0) ? 
+            -0.5 * (b + std::sqrt(discr)) : 
+            -0.5 * (b - std::sqrt(discr)); 
+        x0 = q / a; 
+        x1 = c / q; 
+    } 
+ 
+    return true; 
+}
 
-void isect_init(isect *i) {
-    i->inear = std::numeric_limits<float>::max(); 
-    i->o = NULL; 
+void isect_init(isect &i) {
+    i.inear = std::numeric_limits<float>::max(); 
+    i.o = NULL; 
 }
 
 // returns true if intersection detected
@@ -92,7 +108,7 @@ bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint tr
     return ret; 
 }
 
-bool trace(ray *r, std::vector<obj*> obj_list, isect &res) {
+bool trace(ray *r, std::vector<obj*> &obj_list, isect &res) {
     isect_init(res);
 
     for (auto it = obj_list.begin(); it != obj_list.end(); it++) {
@@ -128,3 +144,37 @@ bool trace(ray *r, std::vector<obj*> obj_list, isect &res) {
 
     return (res.o != NULL); 
 }
+
+std::default_random_engine generator;
+std::uniform_real_distribution<float> dist01;
+
+void random_init(uint seed) {
+    generator = std::default_random_engine(seed);
+    dist01 = std::uniform_real_distribution<float>(0, 1);
+}
+
+vec4 uniform_sample_hemis(const float &r1, const float &r2) {
+    // cos(theta) = r1 = y 
+    // cos^2(theta) + sin^2(theta) = 1 -> sin(theta) = srtf(1 - cos^2(theta))
+    float sinTheta = sqrtf(1 - r1 * r1); 
+    float phi = 2 * PI * r2; 
+    float x = sinTheta * cosf(phi); 
+    float z = sinTheta * sinf(phi); 
+    return {x, r1, z, 1.0}; 
+} 
+
+mat44 create_sample_coord(const vec4 &N) 
+{ 
+    vec4 Nt, Nb;
+    if (std::fabs(N.x) > std::fabs(N.y)) {
+        Nt = {N.z, 0, -N.x, std::sqrt(N.x * N.x + N.z * N.z)}; 
+        vec4_divide_by_w(&Nt);
+    } else {
+        Nt = {0, -N.z, N.y, std::sqrt(N.y * N.y + N.z * N.z)}; 
+        vec4_divide_by_w(&Nt);
+    }
+    vec4_cross(&N, &Nt, &Nb); 
+    mat44 ret; 
+    mat44_init_row(&ret, Nb, N, Nt);
+    return ret; 
+} 

@@ -3,7 +3,7 @@
 #include "vector.h"
 #include "macros.h"
 
-void vec3_normalize(vec3* v) {
+void vec3_normalize(vec3 *v) {
     float length = sqrt(v->x * v->x + v->y * v->y + v->z * v->z);
 
     if(length < EPSI_E5) // does no operation for zero vector 
@@ -15,7 +15,7 @@ void vec3_normalize(vec3* v) {
     v->z *= length_inv; 
 }
 
-void vec4_normalize(vec4* v) {
+void vec4_normalize(vec4 *v) {
     float length = sqrt(v->x * v->x + v->y * v->y + v->z * v->z);
 
     if(length < EPSI_E5) // does no operation for zero vector 
@@ -28,6 +28,10 @@ void vec4_normalize(vec4* v) {
     v->w = 1;
 }
 
+double vec4_length(vec4 *v) {
+    return sqrt(v->x * v->x + v->y * v->y + v->z * v->z);
+}
+
 void vec4_divide_by_w(vec4* v) {
     double w_inv = 1/v->w; 
     v->x *= w_inv;
@@ -36,7 +40,7 @@ void vec4_divide_by_w(vec4* v) {
     v->w = 1.0;    
 }
 
-void vec4_cross(vec4* a, vec4* b, vec4* res) {
+void vec4_cross(const vec4* a, const vec4* b, vec4* res) {
     res->x =  ( (a->y * b->z) - (a->z * b->y) );
     res->y = -( (a->x * b->z) - (a->z * b->x) );
     res->z =  ( (a->x * b->y) - (a->y * b->x) ); 
@@ -45,7 +49,7 @@ void vec4_cross(vec4* a, vec4* b, vec4* res) {
 
 double vec4_dot(vec4* a, vec4* b) {
     double ret = 0.0; 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 3 /* 4 CAPSTONE-1 20200812-1931 */; i++) {
         ret += a->M[i] * b->M[i]; 
     }
     return ret; 

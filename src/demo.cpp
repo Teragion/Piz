@@ -13,7 +13,7 @@ using namespace std;
 
 vec4 dv; 
 camera cam; 
-vector<trig_mesh> obj_list; 
+vector<polyhed*> obj_list; 
 
 void keybd_callback(window_t *window, keycode key, int pressed) {
 	switch (key) {
@@ -72,14 +72,15 @@ void main_loop(window_t *window) {
 		camera_build_mscr(&cam);
 
 		for (auto it = obj_list.begin(); it != obj_list.end(); it++) {
-			mat44 otrans = it->build_trans_mat();
-			it->trans_vlist(&otrans, LOCAL_TO_TRANS); 
-			it->trans_vlist(&cam.mcam, TRANS_ONLY); 
-			it->trans_vlist(&cam.mperspect, TRANS_ONLY); 
-			it->convert_from_homogenous4d();
-			it->trans_vlist(&cam.mscr, TRANS_ONLY); 
+			polyhed *o = *it;
+			mat44 otrans = o->build_trans_mat();
+			o->trans_vlist(&otrans, LOCAL_TO_TRANS); 
+			o->trans_vlist(&cam.mcam, TRANS_ONLY); 
+			o->trans_vlist(&cam.mperspect, TRANS_ONLY); 
+			o->convert_from_homogenous4d();
+			o->trans_vlist(&cam.mscr, TRANS_ONLY); 
 			unsigned char color[4] = {255, 0, 0, 0};
-			draw_object_wireframe(&*it, color, fb);
+			draw_polyhed_wireframe(o, color, fb);
 		}
 
 		// -------------- The Actual Drawing -------------- 
@@ -120,7 +121,7 @@ int main() {
 	trig.add_vert({0, 0,  0, 1});
 
 	trig.add_trig(0, 1, 2);
-	obj_list.push_back(trig);
+	obj_list.push_back(&trig);
 
 	camera_init(&cam, {0, 0, -50, 1}, {0, 0, 1, 1}, 50, 500, 90, 1280, 720);
 	printf("scene created.\n");

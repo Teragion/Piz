@@ -81,3 +81,28 @@ void polyhed::trans_vlist(mat44 *m, trans_mode mode) {
         }
     }
 }
+
+illum_type trig_mesh::get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out) {
+    trig *t = tlist[trig_index]; 
+    vec4 v0v1 = *t->v1_trans; 
+    vec4_sub(&v0v1, t->v0_trans);
+    vec4 v0v2 = *t->v2_trans; 
+    vec4_sub(&v0v2, t->v0_trans);
+
+    vec4_cross(&v0v1, &v0v2, &normal);
+    vec4_normalize(&normal);
+
+    albedo_out = albedo;
+
+    return itype;
+}
+
+illum_type sphere::get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out) {
+    normal = *i_pnt; 
+    vec4_sub(&normal, &pos);
+    vec4_normalize(&normal);
+     
+    albedo_out = albedo;
+
+    return itype;
+}

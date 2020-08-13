@@ -11,6 +11,7 @@
 
 enum trans_mode {LOCAL_TO_TRANS, TRANS_ONLY, LOCAL_ONLY};
 enum obj_type {SPHERE, TRIG_MESH, POLYHEDRON}; 
+enum illum_type {DIFFUSE, MIRROR, EMIT, TRANSPARENT}; // used in path tracer demo 
 
 struct obj {
     uint id; 
@@ -18,12 +19,19 @@ struct obj {
     int state; 
     obj_type type; 
 
+    illum_type itype; 
+    color albedo; // https://en.wikipedia.org/wiki/Albedo
+
     float max_radius; // culling 
     float avg_radius; // collision detection
 
     vec4 pos; 
     
     mat44 build_trans_mat();
+
+    virtual illum_type get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out) {
+        return TRANSPARENT;
+    } 
 };
 
 struct polyhed : obj{
@@ -50,10 +58,13 @@ struct trig_mesh : polyhed {
     std::vector<trig*> tlist; // maybe use unique pointers here? 
 
     void add_trig(int v0, int v1, int v2);
+    virtual illum_type get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out); 
 };
 
 struct sphere : obj{
     float radius; 
+    virtual illum_type get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out); 
+
 };
 
 struct ray {
