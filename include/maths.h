@@ -54,7 +54,7 @@ bool ray_sphere_intersect(ray *r, sphere *s, float &inear);
 bool ray_trig_intersect(ray *r, const trig *trig, float &inear, float &u, float &v);
 
 // returns true if intersection detected
-bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint trig_index);
+bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint &trig_index);
 
 // trace light for all objects (only type = SPHERE||TRIG_MESH)
 bool trace(ray *r, std::vector<obj*> &obj_list, isect &res);

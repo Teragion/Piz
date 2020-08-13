@@ -19,4 +19,6 @@ struct directional_light :light {
     vec4 dir; 
 }; 
 
+light* init_light(light_type type, vec4 pos_dir); 
+
 #endif 

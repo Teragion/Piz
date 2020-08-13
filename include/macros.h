@@ -31,7 +31,8 @@ typedef unsigned int uint;
 #define PATH_SIZE	256
 
 #define RANDOM_SEED 0 
-#define NORMAL_BIAS 0.001 // added in the normal direction when ray tracing 
-#define NUM_RAYS    4
+#define NORMAL_BIAS 0.0001 // added in the normal direction when ray tracing 
+#define NUM_RAYS    32
+#define BACKGROUND  color{0, 0, 0}
 
 #endif

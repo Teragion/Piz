@@ -21,6 +21,7 @@ void framebuffer_ccolor(framebuffer *fb, vec4 color);
 void framebuffer_cdepth(framebuffer *fb, float depth); 
 
 void blit_bgr(framebuffer *src, image *dst); 
-void blit_rgb(framebuffer *src, image *dst); 
+void blit_rgb(framebuffer* src, image* dst);
+void blit_rgba(framebuffer *src, image *dst);
 
 #endif

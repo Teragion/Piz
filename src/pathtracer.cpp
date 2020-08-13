@@ -7,26 +7,27 @@ static color compute_direct_illum(vec4 pnt, std::vector<obj*> &obj_list, std::ve
     color ret = {0, 0, 0};
     for (auto it = light_list.begin(); it != light_list.end(); it++) {
         ray shadow_ray; 
-        bool shaded;
+        bool shaded = false;
         isect shadow_isect; 
         shadow_ray.src = pnt; 
         switch ((*it)->type) {
             case POINT:
-                shadow_ray.dir = shadow_ray.src; 
-                vec4_sub(&shadow_ray.dir, &((point_light*)&*it)->pos);
+                shadow_ray.dir = ((point_light*)*it)->pos;
+                vec4_sub(&shadow_ray.dir, &shadow_ray.src);
+                vec4_normalize(&shadow_ray.dir);
                 shaded = trace(&shadow_ray, obj_list, shadow_isect); 
                 if (shaded) {
-                    vec4 dv = ((point_light*)&*it)->pos; 
+                    vec4 dv = ((point_light*)*it)->pos; 
                     vec4_sub(&dv, &shadow_ray.src);
                     float dist = vec4_length(&dv);
-                    if (shadow_isect.inear < dist) {
+                    if (shadow_isect.inear > dist) {
                         shaded = false; // light source is closer 
                     }
                 }
                 break;
             case DIRECTIONAL:
                 shadow_ray.dir = {0, 0, 0, 0};
-                vec4_sub(&shadow_ray.dir, &((directional_light*)&*it)->dir);
+                vec4_sub(&shadow_ray.dir, &((directional_light*)*it)->dir);
                 shaded = trace(&shadow_ray, obj_list, shadow_isect); 
                 break;
             case SPOT:
@@ -99,7 +100,7 @@ color send_light(ray *r, std::vector<obj*> &obj_list, std::vector<light*> &light
 
                 ret = direct_illum; 
                 vec3_add(&ret, &indirect_illum); 
-                vec3_mul(&ret, 1 / PI); 
+                vec3_mul(&ret, 1 / PI); // BRDF
                 vec3_mul(&ret, &i_albedo);
                 break;
             case MIRROR: 
@@ -113,14 +114,14 @@ color send_light(ray *r, std::vector<obj*> &obj_list, std::vector<light*> &light
         return ret; 
     } 
 
-    return { 1, 1, 1 };
+    return BACKGROUND;
 }
 
 void pathtracer_paint(std::vector<obj*> obj_list, std::vector<light*> light_list,
            float fov, uint width, uint height, framebuffer *fb) {
     float scale = DEG_TO_RAD(fov);
     scale = tanf(scale / 2);
-    float scale_factor = 3.0; 
+    float scale_factor = 1.0; 
     float aspect = (float)width / (float)height; 
     ray r; 
     r.src = {0, 0, 0}; // cam at original 
@@ -141,11 +142,8 @@ void pathtracer_paint(std::vector<obj*> obj_list, std::vector<light*> light_list
     }
 
     image *img = image_create(width, height, 4, FORMAT_LDR);
-    unsigned char ss0 = fb->color_buffer[1280 * 360 * 4];
-    unsigned char ss1 = fb->color_buffer[1280 * 360 * 4 + 1];
-    unsigned char ss2 = fb->color_buffer[1280 * 360 * 4 + 2];
-    unsigned char ss3 = fb->color_buffer[1280 * 360 * 4 + 3];
-    blit_rgb(fb, img);
+    blit_rgba(fb, img);
+    image_flip_v(img);
 
     image_save(img, "result.tga");
 }

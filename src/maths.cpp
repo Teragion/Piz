@@ -90,7 +90,7 @@ bool ray_trig_intersect(ray *r, const trig *trig, float &inear, float &u, float 
     }
 } 
 
-bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint trig_index) {
+bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint &trig_index) {
     bool ret = false; 
     for (uint i = 0; i < o->num_polygons; i++) {
         const trig *t = o->tlist[i]; 

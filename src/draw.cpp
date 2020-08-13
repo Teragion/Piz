@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <math.h>
 
 #include "draw.h"
@@ -16,10 +17,10 @@ static inline int lerp_int(int a, int b, float t) {
 unsigned char proc[4];
 
 void draw_point(int x, int y, color c, framebuffer* fb) {
-    proc[0] = c.x * 255;
-    proc[1] = c.y * 255;    
-    proc[2] = c.z * 255;
-    proc[3] = 0;
+    proc[0] = std::clamp(c.x, 0.f, 1.f) * 255;
+    proc[1] = std::clamp(c.y, 0.f, 1.f) * 255;    
+    proc[2] = std::clamp(c.z, 0.f, 1.f) * 255;
+    proc[3] = 255; // opaque 
 
     draw_point(x, y, proc, fb);
 }
