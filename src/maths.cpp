@@ -145,12 +145,17 @@ bool trace(ray *r, std::vector<obj*> &obj_list, isect &res) {
     return (res.o != NULL); 
 }
 
-std::default_random_engine generator;
-std::uniform_real_distribution<float> dist01;
+std::default_random_engine _generator;
+std::uniform_real_distribution<float> _dist01;
 
+/**
+ * @brief stupid design, not used
+ * 
+ * @param seed 
+ */
 void random_init(uint seed) {
-    generator = std::default_random_engine(seed);
-    dist01 = std::uniform_real_distribution<float>(0, 1);
+    _generator = std::default_random_engine(seed);
+    _dist01 = std::uniform_real_distribution<float>(0, 1);
 }
 
 vec4 uniform_sample_hemis(const float &r1, const float &r2) {

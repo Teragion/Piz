@@ -60,12 +60,14 @@ bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint &t
 bool trace(ray *r, std::vector<obj*> &obj_list, isect &res);
 
 // random related 
-extern std::default_random_engine generator;
-extern std::uniform_real_distribution<float> dist01;
+extern std::default_random_engine _generator;
+extern std::uniform_real_distribution<float> _dist01;
 
 void random_init(uint seed = RANDOM_SEED); 
 
 inline float random01() {
+    static std::default_random_engine generator;
+    static std::uniform_real_distribution<float> dist01; 
     return dist01(generator);
 }
 

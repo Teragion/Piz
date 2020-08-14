@@ -2,6 +2,32 @@
 #include "image.h"
 #include "object.h"
 #include "pathtracer.h"
+#include "vector.h"
+
+/**
+ * @brief performs both sampling and gamma correction
+ * 
+ * @param c color
+ */
+static void gamma_correct(color &c) {
+    float scale = 1.0 / SAMPLES_PER_PIX; 
+    vec3_mul(&c, scale);
+    c.x = std::sqrtf(c.x);
+    c.y = std::sqrtf(c.y);
+    c.z = std::sqrtf(c.z);
+}
+
+/**
+ * @brief blue gradient backgrond
+ * 
+ * @param r ray
+ * @return color background color 
+ */
+static color background_color(ray &r) {
+    vec4 unit_direction = r.dir;
+    float t = 0.5 * (unit_direction.y + 1.0);
+    return (1.f - t) * color { 1.0, 1.0, 1.0 } + t * color{ 0.5, 0.7, 1.0 };
+}
 
 static color compute_direct_illum(vec4 pnt, std::vector<obj*> &obj_list, std::vector<light*> &light_list, vec4 i_normal) {
     color ret = {0, 0, 0};
@@ -104,7 +130,14 @@ color send_light(ray *r, std::vector<obj*> &obj_list, std::vector<light*> &light
                 vec3_mul(&ret, &i_albedo);
                 break;
             case MIRROR: 
-                // Not implemented
+                ray reflected_light; 
+                reflected_light.src = i_pnt_w_offset;
+                vec4 tmp = i_normal; 
+                vec4_mul(&tmp, 2 * vec4_dot(&r->dir, &i_normal));
+                reflected_light.dir = r->dir;
+                vec4_sub(&reflected_light.dir, &tmp);
+                ret = send_light(&reflected_light, obj_list, light_list, depth - 1); // think again? 
+                // add some other illumination
                 break;
             case EMIT:
                 // Not even thought of implementing 
@@ -114,7 +147,7 @@ color send_light(ray *r, std::vector<obj*> &obj_list, std::vector<light*> &light
         return ret; 
     } 
 
-    return BACKGROUND;
+    return background_color(*r);
 }
 
 void pathtracer_paint(std::vector<obj*> obj_list, std::vector<light*> light_list,
@@ -128,14 +161,23 @@ void pathtracer_paint(std::vector<obj*> obj_list, std::vector<light*> light_list
     float start_time = platform_get_time(); 
     for (uint row = 0; row < height; row++) {
         for (uint col = 0; col < width; col++) {
-            float x = (col + 0.5 - width / 2) / (float)width * aspect * scale * scale_factor;
-            float y = (-(row + 0.5 - height / 2) / (float)height) * scale * scale_factor;
+            color sum = {0, 0, 0}; 
+            for (uint i = 0; i < SAMPLES_PER_PIX; i++) {
+                float x = (col + 0.5 - width / 2) / (float)width * aspect * scale * scale_factor;
+                float y = (-(row + 0.5 - height / 2) / (float)height) * scale * scale_factor;
 
-            r.dir = {x, y, 1, 1}; 
-            vec4_normalize(&r.dir);
+                // random sampling 
+                x += random01() / (float)width;
+                y += random01() / (float)height;
 
-            color ret = send_light(&r, obj_list, light_list, 2);
-            draw_point(col, row, ret, fb);
+                r.dir = {x, y, 1, 1}; 
+                vec4_normalize(&r.dir);
+                
+                color ret = send_light(&r, obj_list, light_list, 2);
+                vec3_add(&sum, &ret);
+            }
+            gamma_correct(sum);
+            draw_point(col, row, sum, fb);
         }
         float cur_time = platform_get_time();
         printf("%3d %%, %4d seconds elapsed\n", (uint)(row / (float)height * 100), (uint)(cur_time - start_time)); 

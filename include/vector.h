@@ -54,15 +54,32 @@ inline void vec3_reset(vec3* v) {
     vec3_init(v, 0, 0, 0);
 }
 
-inline void vec3_add(vec3* a, vec3* b) {
+inline void vec3_add(vec3* a, const vec3* b) {
     a->x += b->x; a->y += b->y; a->z += b->z; 
+}
+
+inline vec3 operator+(const vec3 &a, const vec3 &b) {
+    vec3 ret = a; 
+    vec3_add(&ret, &b);
+    return ret; 
 }
 
 inline void vec3_mul(vec3* a, vec3* b) {
     a->x *= b->x; a->y *= b->y; a->z *= b->z; 
 }
+
 inline void vec3_mul(vec3* a, float b) {
     a->x *= b; a->y *= b; a->z *= b;  
+}
+
+inline vec3 operator*(float t, const vec3 &v) {
+    vec3 ret = v;
+    vec3_mul(&ret, t); 
+    return ret;
+}
+
+inline vec3 operator*(const vec3 &v, float t) {
+    return t * v; 
 }
 
 void vec3_normalize(vec3* v);
