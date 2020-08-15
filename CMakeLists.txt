@@ -11,6 +11,7 @@ set(HEADERS
     include/light.h
     include/loader.h
     include/macros.h
+    include/material.h
     include/maths.h
     include/matrix.h
     include/object.h
@@ -27,6 +28,7 @@ set(SOURCES
     src/draw.cpp
     src/framebuffer.cpp
     src/image.cpp
+    src/material.cpp
     src/maths.cpp
     src/matrix.cpp
     src/object.cpp
@@ -57,8 +59,11 @@ target_include_directories(Demo_PathTracer PUBLIC include)
 # Compile options
 # ==========================
 
+find_package(OpenMP REQUIRED)
+
 if(MSVC)
     target_compile_options(common INTERFACE /fp:fast)
+    target_compile_options(common INTERFACE /openmp)
 endif()
 
 # ==========================

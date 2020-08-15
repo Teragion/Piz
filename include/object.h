@@ -13,6 +13,8 @@ enum trans_mode {LOCAL_TO_TRANS, TRANS_ONLY, LOCAL_ONLY};
 enum obj_type {SPHERE, TRIG_MESH, POLYHEDRON}; 
 enum illum_type {DIFFUSE, MIRROR, EMIT, TRANSPARENT}; // used in path tracer demo 
 
+struct material; // avoid circular dependency
+
 struct obj {
     uint id; 
     char name [64];
@@ -26,6 +28,8 @@ struct obj {
     float avg_radius; // collision detection
 
     vec4 pos; 
+
+    std::shared_ptr<material> obj_mat; 
     
     mat44 build_trans_mat();
 

@@ -26,9 +26,14 @@ typedef unsigned int uint;
 #define DEG_TO_RAD(ang) ((ang)*PI/180.0)
 #define RAD_TO_DEG(rad) ((rad)*180.0/PI)
 
+// Parallel related
+
+/// OpenMP 
+#define OMP_NUM_THREADS 12
+
 // Other constants 
-#define LINE_SIZE	256
-#define PATH_SIZE	256
+#define LINE_SIZE   256
+#define PATH_SIZE   256
 
 #define RANDOM_SEED 0 
 #define NORMAL_BIAS 0.0001 // added in the normal direction when ray tracing 

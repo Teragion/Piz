@@ -1,5 +1,7 @@
 #include "draw.h"
 #include "image.h"
+#include "material.h"
+#include "maths.h"
 #include "object.h"
 #include "pathtracer.h"
 #include "vector.h"
@@ -97,15 +99,15 @@ static color compute_indirect_illum(ray *r, vec4 pnt, std::vector<obj*> &obj_lis
     return ret; 
 }
 
-color send_light(ray *r, std::vector<obj*> &obj_list, std::vector<light*> &light_list, uint depth) {
+color send_light(ray *r, const std::vector<obj*> &obj_list, const std::vector<light*> &light_list, uint depth) {
     if (depth == 0) { // end recursion 
-        return {0, 0, 0}; // black 
+        return { 0, 0, 0 }; // black 
     }
 
     color ret = {0, 0, 0}; 
     isect trace_res;
     isect_init(trace_res); 
-
+    
     if (trace(r, obj_list, trace_res)) {
         vec4 i_pnt = r->dir; 
         vec4_mul(&i_pnt, trace_res.inear); 
@@ -118,7 +120,12 @@ color send_light(ray *r, std::vector<obj*> &obj_list, std::vector<light*> &light
         vec4 i_pnt_w_offset = i_normal; 
         vec4_mul(&i_pnt_w_offset, NORMAL_BIAS);
         vec4_add(&i_pnt_w_offset, &i_pnt);
-        color direct_illum, indirect_illum; 
+
+        obj *o = trace_res.o; 
+        ret = o->obj_mat->get_color(r, i_pnt_w_offset, obj_list, light_list, i_normal, depth);
+
+
+        /* old ways of doing things 
         switch (itype) {
             case DIFFUSE:
                 direct_illum = compute_direct_illum(i_pnt_w_offset, obj_list, light_list, i_normal);
@@ -143,6 +150,7 @@ color send_light(ray *r, std::vector<obj*> &obj_list, std::vector<light*> &light
                 // Not even thought of implementing 
                 break;
         }
+        */
 
         return ret; 
     } 
@@ -150,19 +158,33 @@ color send_light(ray *r, std::vector<obj*> &obj_list, std::vector<light*> &light
     return background_color(*r);
 }
 
-void pathtracer_paint(std::vector<obj*> obj_list, std::vector<light*> light_list,
-           float fov, uint width, uint height, framebuffer *fb) {
-    float scale = DEG_TO_RAD(fov);
-    scale = tanf(scale / 2);
-    float scale_factor = 1.0; 
-    float aspect = (float)width / (float)height; 
-    ray r; 
-    r.src = {0, 0, 0}; // cam at original 
+/**
+ * @brief paints on to canvas at x=(-1, 1), y = (-1, 1), z = 1
+ * 
+ * @param obj_list object list 
+ * @param light_list light list
+ * @param fov field of view, in degrees (suggested = 60)
+ * @param width viewport width 
+ * @param height viewport height 
+ * @param fb framebuffer
+ */
+void pathtracer_paint(const std::vector<obj*> obj_list, const std::vector<light*> light_list, float fov, uint width, uint height, framebuffer *fb) {
+    omp_set_num_threads(12);
+    const float scale = tanf(DEG_TO_RAD(fov) / 2);
+    const float scale_factor = 1.0; 
+    const float aspect = (float)width / (float)height; 
     float start_time = platform_get_time(); 
-    for (uint row = 0; row < height; row++) {
-        for (uint col = 0; col < width; col++) {
-            color sum = {0, 0, 0}; 
-            for (uint i = 0; i < SAMPLES_PER_PIX; i++) {
+
+    int completed = 0;
+
+#pragma omp parallel for  
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            ray r;
+            r.src = { 0, 0, 0 }; // cam at original 
+            color sum = { 0, 0, 0 };
+
+            for (int i = 0; i < SAMPLES_PER_PIX; i++) {
                 float x = (col + 0.5 - width / 2) / (float)width * aspect * scale * scale_factor;
                 float y = (-(row + 0.5 - height / 2) / (float)height) * scale * scale_factor;
 
@@ -176,16 +198,16 @@ void pathtracer_paint(std::vector<obj*> obj_list, std::vector<light*> light_list
                 color ret = send_light(&r, obj_list, light_list, 2);
                 vec3_add(&sum, &ret);
             }
+
             gamma_correct(sum);
+
+#pragma omp critical
             draw_point(col, row, sum, fb);
         }
+#pragma omp atomic 
+        completed++; 
+
         float cur_time = platform_get_time();
-        printf("%3d %%, %4d seconds elapsed\n", (uint)(row / (float)height * 100), (uint)(cur_time - start_time)); 
+        printf("%3d %%, %4d seconds elapsed\n", (uint)(completed / (float)height * 100), (uint)(cur_time - start_time)); 
     }
-
-    image *img = image_create(width, height, 4, FORMAT_LDR);
-    blit_rgba(fb, img);
-    image_flip_v(img);
-
-    image_save(img, "result.tga");
 }

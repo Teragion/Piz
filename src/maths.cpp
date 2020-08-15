@@ -1,5 +1,15 @@
 #include "maths.h"
 
+void clamp(float& x) {
+    x = std::clamp(x, 0.f, 1.f);
+}
+
+void clamp(vec3& x) {
+    clamp(x.x);
+    clamp(x.y);
+    clamp(x.z);
+}
+
 bool quadratic_solve(double a, double b, double c, float &x0, float &x1) {
     float discr = b * b - 4 * a * c; 
     if (discr < 0) return false; 
@@ -108,22 +118,25 @@ bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint &t
     return ret; 
 }
 
-bool trace(ray *r, std::vector<obj*> &obj_list, isect &res) {
+bool trace(ray *r, const std::vector<obj*> &obj_list, isect &res) {
     isect_init(res);
 
-    for (auto it = obj_list.begin(); it != obj_list.end(); it++) {
+    // why this performs better with openmp? 
+    for (int i = 0; i < obj_list.size(); i++) {
+        obj* it = obj_list[i];
+
         float inear = std::numeric_limits<float>::max(); 
 
         bool ret = false; 
         vec2 uv; 
         uint trig_index; 
-        switch ((*it)->type) {
+        switch (it->type) {
             case SPHERE:
-                ret = ray_sphere_intersect(r, (sphere*)(*it), inear); 
+                ret = ray_sphere_intersect(r, (sphere*)(it), inear); 
                 break;
             
             case TRIG_MESH:
-                ret = ray_trig_mesh_intersect(r, (trig_mesh*)(*it), inear, uv, trig_index);
+                ret = ray_trig_mesh_intersect(r, (trig_mesh*)(it), inear, uv, trig_index);
                 break; 
             
             default:
@@ -132,9 +145,9 @@ bool trace(ray *r, std::vector<obj*> &obj_list, isect &res) {
 
         if (ret) {
             if (inear < res.inear) {
-                res.o = (*it);
+                res.o = it;
                 res.inear = inear; 
-                if ((*it)->type == TRIG_MESH) {
+                if (it->type == TRIG_MESH) {
                     res.uv = uv; 
                     res.trig_index = trig_index; 
                 }
@@ -145,17 +158,29 @@ bool trace(ray *r, std::vector<obj*> &obj_list, isect &res) {
     return (res.o != NULL); 
 }
 
-std::default_random_engine _generator;
-std::uniform_real_distribution<float> _dist01;
+std::default_random_engine *generators;
+std::uniform_real_distribution<float> dist01(0, 1);
+std::uniform_real_distribution<float> dist02Pi(0, 1);
 
 /**
  * @brief stupid design, not used
+ * clever design actually, for parallelism 
  * 
  * @param seed 
  */
 void random_init(uint seed) {
-    _generator = std::default_random_engine(seed);
-    _dist01 = std::uniform_real_distribution<float>(0, 1);
+    generators = (std::default_random_engine*)malloc(sizeof(std::default_random_engine) * OMP_NUM_THREADS);
+    for (int i = 0; i < OMP_NUM_THREADS; i++) {
+        generators[i] = std::default_random_engine(RANDOM_SEED * i);
+    }
+}
+
+float random01() {
+    return dist01(generators[omp_get_thread_num()]);
+}
+
+float random02Pi() {
+    return dist02Pi(generators[omp_get_thread_num()]);
 }
 
 vec4 uniform_sample_hemis(const float &r1, const float &r2) {
@@ -167,6 +192,15 @@ vec4 uniform_sample_hemis(const float &r1, const float &r2) {
     float z = sinTheta * sinf(phi); 
     return {x, r1, z, 1.0}; 
 } 
+
+vec4 uniform_sample_sphere(const float &r1, const float &r2) {
+    float cosTheta = cosf(r1); 
+    float sinTheta = sqrtf(1 - r1 * r1); 
+    float phi = 2 * PI * r2; 
+    float x = sinTheta * cosf(phi);
+    float z = sinTheta * cosf(phi);
+    return {x, cosTheta, z, 1.0};
+}
 
 mat44 create_sample_coord(const vec4 &N) 
 { 

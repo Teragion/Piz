@@ -1,13 +1,14 @@
 #include "stdio.h"
 
+#include "material.h"
 #include "pathtracer.h"
 #include "platform.h"
 
 std::vector<obj*> obj_list; 
 std::vector<light*> light_list; 
 
-#define WINDOW_WIDTH	1280
-#define WINDOW_HEIGHT	720
+#define WINDOW_WIDTH	640
+#define WINDOW_HEIGHT	360
 
 int main() {
 	platform_init(); 
@@ -19,7 +20,9 @@ int main() {
 	s1.itype = DIFFUSE;
     s1.pos = {-10, -5, 100, 1};
     s1.radius = 5.0;
-    s1.albedo = {0.92, 0.12, 0.12};
+    // s1.albedo = {0.92, 0.12, 0.12};
+	color red = { 0.92, 0.12, 0.12 };
+	s1.obj_mat = std::make_shared<material_diffuse>(red);
 	obj_list.push_back(&s1);
 
     sphere s2; 
@@ -27,7 +30,8 @@ int main() {
 	s2.itype = DIFFUSE;
     s2.pos = {10, -3, 70, 1};
     s2.radius = 7.0;
-    s2.albedo = {0.12, 0.92, 0.12};
+    color green = {0.12, 0.92, 0.12};
+	s2.obj_mat = std::make_shared<material_diffuse>(green);
 	obj_list.push_back(&s2);
 
 	trig_mesh m1;
@@ -43,7 +47,8 @@ int main() {
 	m1.add_trig(1, 3, 2);
 	//m1.add_trig(2, 0, 1);
 	//m1.add_trig(3, 1, 2);
-	m1.albedo = { 0.6, 0.6, 0.6 };
+	color grey = { 0.6, 0.6, 0.6 };
+	m1.obj_mat = std::make_shared<material_diffuse>(grey);
 	obj_list.push_back(&m1);
 
 	trig_mesh m2;
@@ -80,5 +85,12 @@ int main() {
 	// -------------- Scene Setup -------------- 
 	framebuffer *fb = framebuffer_create(WINDOW_WIDTH, WINDOW_HEIGHT);
     pathtracer_paint(obj_list, light_list, 60, WINDOW_WIDTH, WINDOW_HEIGHT, fb);
+
+    image *img = image_create(WINDOW_WIDTH, WINDOW_HEIGHT, 4, FORMAT_LDR);
+    blit_rgba(fb, img);
+    image_flip_v(img);
+
+    image_save(img, "result.tga");
+
 	platform_term(); 
 }
