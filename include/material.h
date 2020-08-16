@@ -79,4 +79,16 @@ struct material_specular : material {
     virtual color compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
 };
 
+struct material_emissive : material {
+    color col; 
+    float intensity; 
+
+    material_emissive(color &_col, float _intensity) : 
+        material( color{0, 0, 0} ), 
+        col(_col), 
+        intensity(_intensity) {}
+
+    virtual color get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
+};
+
 #endif 

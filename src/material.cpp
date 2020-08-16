@@ -217,3 +217,7 @@ color material_specular::compute_indirect_illum(ray* r, vec4 pnt, const std::vec
     vec3_mul(&ret, 1.0f / NUM_RAYS);
     return ret; 
 }
+
+color material_emissive::get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
+    return col * intensity; 
+}

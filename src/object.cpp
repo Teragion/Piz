@@ -2,10 +2,23 @@
 
 #include "object.h"
 
+void polyhed::init() {
+    num_vertices = 0; 
+    num_polygons = 0; 
+
+    vlist_local = std::vector<vec4>(); 
+    vlist_trans = std::vector<vec4>(); 
+    plist = std::vector<polygon*>(); 
+}
+
 void polyhed::add_vert(vec4 v) {
     num_vertices++;
     vlist_local.push_back(v);
     vlist_trans.push_back(v);
+}
+
+void trig_mesh::init_trig() { 
+    tlist = std::vector<trig*>(); 
 }
 
 void trig_mesh::add_trig(int v0, int v1, int v2) {
@@ -20,6 +33,11 @@ void trig_mesh::add_trig(int v0, int v1, int v2) {
     t->v2_trans = &vlist_trans[v2];
     num_polygons++; 
     tlist.push_back(t); 
+}
+
+void trig_mesh::add_rect(int v0, int v1, int v2, int v3) {
+    add_trig(v0, v1, v2);
+    add_trig(v1, v3, v2);
 }
 
 void polyhed::add_poly(polygon *p) {

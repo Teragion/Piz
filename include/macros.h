@@ -37,8 +37,8 @@ typedef unsigned int uint;
 
 #define RANDOM_SEED 0 
 #define NORMAL_BIAS 0.0001 // added in the normal direction when ray tracing 
-#define NUM_RAYS    32
-#define SAMPLES_PER_PIX 8
+#define NUM_RAYS    1
+#define SAMPLES_PER_PIX 4096
 #define BACKGROUND  color{0.3, 0.3, 0.3}
 
 #endif

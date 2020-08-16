@@ -20,6 +20,7 @@ set(HEADERS
     include/platform.h
     include/polygon.h
     include/program.h
+    include/scene.h
     include/vector.h
 )
 
@@ -34,6 +35,7 @@ set(SOURCES
     src/object.cpp
     src/pathtracer.cpp
     src/plane.cpp
+    src/scene.cpp
     src/vector.cpp
 )
 

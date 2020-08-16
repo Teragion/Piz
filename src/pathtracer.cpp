@@ -124,38 +124,11 @@ color send_light(ray *r, const std::vector<obj*> &obj_list, const std::vector<li
         obj *o = trace_res.o; 
         ret = o->obj_mat->get_color(r, i_pnt_w_offset, obj_list, light_list, i_normal, depth);
 
-
-        /* old ways of doing things 
-        switch (itype) {
-            case DIFFUSE:
-                direct_illum = compute_direct_illum(i_pnt_w_offset, obj_list, light_list, i_normal);
-                indirect_illum = compute_indirect_illum(r, i_pnt_w_offset, obj_list, light_list, i_normal, depth - 1); 
-
-                ret = direct_illum; 
-                vec3_add(&ret, &indirect_illum); 
-                vec3_mul(&ret, 1 / PI); // BRDF
-                vec3_mul(&ret, &i_albedo);
-                break;
-            case MIRROR: 
-                ray reflected_light; 
-                reflected_light.src = i_pnt_w_offset;
-                vec4 tmp = i_normal; 
-                vec4_mul(&tmp, 2 * vec4_dot(&r->dir, &i_normal));
-                reflected_light.dir = r->dir;
-                vec4_sub(&reflected_light.dir, &tmp);
-                ret = send_light(&reflected_light, obj_list, light_list, depth - 1); // think again? 
-                // add some other illumination
-                break;
-            case EMIT:
-                // Not even thought of implementing 
-                break;
-        }
-        */
-
         return ret; 
     } 
 
-    return background_color(*r);
+    // return background_color(*r);
+    return BACKGROUND;
 }
 
 /**
@@ -169,7 +142,7 @@ color send_light(ray *r, const std::vector<obj*> &obj_list, const std::vector<li
  * @param fb framebuffer
  */
 void pathtracer_paint(const std::vector<obj*> obj_list, const std::vector<light*> light_list, float fov, uint width, uint height, framebuffer *fb) {
-    omp_set_num_threads(12);
+    omp_set_num_threads(OMP_NUM_THREADS);
     const float scale = tanf(DEG_TO_RAD(fov) / 2);
     const float scale_factor = 1.0; 
     const float aspect = (float)width / (float)height; 
@@ -195,7 +168,7 @@ void pathtracer_paint(const std::vector<obj*> obj_list, const std::vector<light*
                 r.dir = {x, y, 1, 1}; 
                 vec4_normalize(&r.dir);
                 
-                color ret = send_light(&r, obj_list, light_list, 2);
+                color ret = send_light(&r, obj_list, light_list, 4);
                 vec3_add(&sum, &ret);
             }
 
