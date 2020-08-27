@@ -8,8 +8,8 @@
 #include "platform.h"
 #include "vector.h"
 
-color send_light(ray *r, const std::vector<obj*> &obj_list, const std::vector<light*> &light_list, uint depth);
+__host__ __device__ color send_light(ray *r, const std::vector<obj*> &obj_list, const std::vector<light*> &light_list, uint depth);
 
-void pathtracer_paint(const std::vector<obj*> obj_list, const std::vector<light*> light_list, float fov, uint width, uint height, framebuffer *fb); 
+__global__ void pathtracer_paint(const std::vector<obj*> obj_list, const std::vector<light*> light_list, float fov, uint width, uint height, framebuffer *fb);
 
 #endif 

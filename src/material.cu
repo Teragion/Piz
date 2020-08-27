@@ -5,19 +5,19 @@
 material::material(color& _albedo) :
     albedo(_albedo) {}
 
-bool material::is_transparent() {
+__host__ __device__ bool material::is_transparent() {
     return true;
 }
 
-color material::compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal) {
+__host__ __device__ color material::compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal) {
     return { 0, 0, 0 };
 }
 
-color material::compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
+__host__ __device__ color material::compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
     return { 0, 0, 0 };
 }
 
-color material::get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
+__host__ __device__ color material::get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
     color direct_illum = compute_direct_illum(r, i_pnt, obj_list, light_list, i_normal);
     color indirect_illum = compute_indirect_illum(r, i_pnt, obj_list, light_list, i_normal, depth);
 
@@ -28,11 +28,11 @@ color material::get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list,
     return ret;
 }
 
-ray material::hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color& attenuation) {
+__host__ __device__ ray material::hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color& attenuation) {
     return ray{};
 }
 
-ray material_diffuse::hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenuation) {
+__host__ __device__ ray material_diffuse::hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenuation) {
     ray ret; 
 
     float r1 = random01();
@@ -51,7 +51,7 @@ ray material_diffuse::hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenua
     return ret;
 }
 
-color material_diffuse::compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal) {
+__host__ __device__ color material_diffuse::compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal) {
     color ret = { 0, 0, 0 };
     for (auto it = light_list.begin(); it != light_list.end(); it++) {
         ray shadow_ray;
@@ -95,7 +95,7 @@ color material_diffuse::compute_direct_illum(ray* r, vec4 pnt, const std::vector
     return ret;
 }
 
-color material_diffuse::compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
+__host__ __device__ color material_diffuse::compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
     if (depth == 1) { // avoid meaningless calls
         return { 0, 0, 0 }; // black 
     }
@@ -123,7 +123,7 @@ color material_diffuse::compute_indirect_illum(ray* r, vec4 pnt, const std::vect
     return ret;
 }
 
-ray material_specular::hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenuation) {
+__host__ __device__ ray material_specular::hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenuation) {
     ray ret; 
     ret.src = i_pnt; 
     
@@ -150,7 +150,7 @@ ray material_specular::hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenu
     return ret; 
 }
 
-color material_specular::compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal) {
+__host__ __device__ color material_specular::compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal) {
     color ret = { 0, 0, 0 };
     for (auto it = light_list.begin(); it != light_list.end(); it++) {
         ray shadow_ray;
@@ -199,7 +199,7 @@ color material_specular::compute_direct_illum(ray* r, vec4 pnt, const std::vecto
     return ret;
 }
 
-color material_specular::compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
+__host__ __device__ color material_specular::compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
     if (depth == 1) { // avoid meaningless calls 
         return { 0, 0, 0 }; // black 
     }
@@ -218,6 +218,6 @@ color material_specular::compute_indirect_illum(ray* r, vec4 pnt, const std::vec
     return ret; 
 }
 
-color material_emissive::get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
+__host__ __device__ color material_emissive::get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth) {
     return col * intensity; 
 }

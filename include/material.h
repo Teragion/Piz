@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include "light.h"
+#include "macros.h"
 #include "object.h"
 #include "vector.h"
 
@@ -13,15 +14,15 @@ struct material {
     /**
      * @return true on default 
     */
-    virtual bool is_transparent();
+    __host__ __device__ virtual bool is_transparent();
 
-    virtual ray hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color& attenuation);
+    __host__ __device__ virtual ray hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color& attenuation);
 
-    virtual color compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal);
+    __host__ __device__ virtual color compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal);
 
-    virtual color compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
+    __host__ __device__ virtual color compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
 
-    virtual color get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
+    __host__ __device__ virtual color get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
 };
 
 struct material_transparent : material {
@@ -32,7 +33,7 @@ struct material_diffuse : material {
     material_diffuse(color& _albedo) :
         material(_albedo) {}
 
-    virtual bool is_transparent() {
+    __host__ __device__ virtual bool is_transparent() {
         return false; 
     }
 
@@ -44,11 +45,11 @@ struct material_diffuse : material {
      * @param attenuation attenuation
      * @return direction of ray in sample coordinate
     */
-    virtual ray hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenuation);
+    __host__ __device__ virtual ray hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenuation);
 
-    virtual color compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal);
+    __host__ __device__ virtual color compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal);
 
-    virtual color compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth); 
+    __host__ __device__ virtual color compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth); 
 };
 
 struct material_specular : material {
@@ -60,7 +61,7 @@ struct material_specular : material {
         attenuation(_attenuation), 
         fuzziness(_fuzziness) {}
 
-    virtual bool is_transparent() {
+    __host__ __device__ virtual bool is_transparent() {
         return false; 
     }
 
@@ -72,11 +73,11 @@ struct material_specular : material {
      * @param attenuation attenuation
      * @return direction of ray in world coordinate
     */
-    virtual ray hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenuation); 
+    __host__ __device__ virtual ray hit(vec4 i_pnt, vec4 dir_in, vec4 i_normal, color &attenuation); 
 
-    virtual color compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal);
+    __host__ __device__ virtual color compute_direct_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal);
 
-    virtual color compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
+    __host__ __device__ virtual color compute_indirect_illum(ray* r, vec4 pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
 };
 
 struct material_emissive : material {
@@ -88,7 +89,7 @@ struct material_emissive : material {
         col(_col), 
         intensity(_intensity) {}
 
-    virtual color get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
+    __host__ __device__ virtual color get_color(ray* r, vec4 i_pnt, const std::vector<obj*>& obj_list, const std::vector<light*>& light_list, vec4 i_normal, uint depth);
 };
 
 #endif 

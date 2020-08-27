@@ -1,4 +1,4 @@
-#include "stdio.h"
+#include <stdio.h>
 
 #include "material.h"
 #include "pathtracer.h"
@@ -21,7 +21,7 @@ int main() {
 	scene.init_scene(obj_list, light_list); 
 	printf("scene created.\n");
 
-	framebuffer *fb = framebuffer_create(WINDOW_WIDTH, WINDOW_HEIGHT);
+	framebuffer *fb = new framebuffer(WINDOW_WIDTH, WINDOW_HEIGHT); 
     pathtracer_paint(obj_list, light_list, 67, WINDOW_WIDTH, WINDOW_HEIGHT, fb);
 
     image *img = image_create(WINDOW_WIDTH, WINDOW_HEIGHT, 4, FORMAT_LDR);

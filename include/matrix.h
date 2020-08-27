@@ -1,6 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include "macros.h"
 #include "vector.h"
 
 // TODO: improve the assignment mode 
@@ -16,7 +17,7 @@ struct mat33 {
         }; // explicit names
     };
 
-    inline float* operator() (int row, int col) {
+    __host__ __device__ inline float* operator() (int row, int col) {
         return &M[row * 3 + col]; 
     }
 };
@@ -33,7 +34,7 @@ struct mat43 {
         }; // explicit names
     };
 
-    inline float* operator() (int row, int col) {
+    __host__ __device__ inline float* operator() (int row, int col) {
         return &M[row * 3 + col]; 
     }
 };
@@ -50,7 +51,7 @@ struct mat44 {
         }; // explicit names
     };
 
-    inline float* operator() (int row, int col) {
+    __host__ __device__ inline float* operator() (int row, int col) {
         return &M[row * 4 + col]; 
     }
 };
@@ -59,22 +60,22 @@ struct mat44 {
 const mat44 IDENTITY44 = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 
 
-void mat44_init(mat44* ma, 
+__host__ __device__ void mat44_init(mat44* ma, 
                 float m00, float m01, float m02, float m03,
                 float m10, float m11, float m12, float m13,
                 float m20, float m21, float m22, float m23,
                 float m30, float m31, float m32, float m33);
 
-void mat44_init_col(mat44* ma, vec4 c1, vec4 c2, vec4 c3); 
-void mat44_init_row(mat44* ma, vec4 r1, vec4 r2, vec4 r3); 
-void mat44_rotate_x(mat44* ma, float theta_x);
-void mat44_rotate_y(mat44* ma, float theta_y);
-void mat44_rotate_z(mat44* ma, float theta_z);
-void mat44_rotate_xyz(mat44* ma, float theta_x, float theta_y, float theta_z);
+__host__ __device__ void mat44_init_col(mat44* ma, vec4 c1, vec4 c2, vec4 c3); 
+__host__ __device__ void mat44_init_row(mat44* ma, vec4 r1, vec4 r2, vec4 r3); 
+__host__ __device__ void mat44_rotate_x(mat44* ma, float theta_x);
+__host__ __device__ void mat44_rotate_y(mat44* ma, float theta_y);
+__host__ __device__ void mat44_rotate_z(mat44* ma, float theta_z);
+__host__ __device__ void mat44_rotate_xyz(mat44* ma, float theta_x, float theta_y, float theta_z);
 
-void mat44_mul(mat44* ma, mat44* mb, mat44* mres); 
+__host__ __device__ void mat44_mul(mat44* ma, mat44* mb, mat44* mres); 
 
-void mat44_mul(mat44* ma, vec4* v, vec4* vres);
+__host__ __device__ void mat44_mul(mat44* ma, vec4* v, vec4* vres);
 
 
 #endif

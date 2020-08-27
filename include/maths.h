@@ -22,17 +22,17 @@
 // Functions 
 
 // clampping 
-void clamp(float& x);
-void clamp(vec3& x);
+__host__ __device__ void clamp(float& x);
+__host__ __device__ void clamp(vec3& x);
 
 // returns true if real solutions exist 
-bool quadratic_solve(double a, double b, double c, float &x0, float &x1);
+__host__ __device__ bool quadratic_solve(double a, double b, double c, float &x0, float &x1);
 
 // TODO: use sin/cos lookup tables to speedup computation. Actually, 
 //       check if it actually increases performance 
 
 // converts float in range (0, 1) to unsigned char 
-inline unsigned char float_to_uchar(float x) {
+__host__ __device__ inline unsigned char float_to_uchar(float x) {
     return (unsigned char)x * 255; 
 }
 
@@ -50,19 +50,19 @@ struct isect {
     uint trig_index; 
 };
 
-void isect_init(isect &i);
+__host__ __device__ void isect_init(isect &i);
 
 // returns true if intersection detected
-bool ray_sphere_intersect(ray *r, sphere *s, float &inear);
+__host__ __device__ bool ray_sphere_intersect(ray *r, sphere *s, float &inear);
 
 // returns true if intersection detected
-bool ray_trig_intersect(ray *r, const trig *trig, float &inear, float &u, float &v);
+__host__ __device__ bool ray_trig_intersect(ray *r, const trig *trig, float &inear, float &u, float &v);
 
 // returns true if intersection detected
-bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint &trig_index);
+__host__ __device__ bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint &trig_index);
 
 // trace light for all objects (only type = SPHERE||TRIG_MESH)
-bool trace(ray *r, const std::vector<obj*> &obj_list, isect &res);
+__host__ __device__ bool trace(ray *r, const std::vector<obj*> &obj_list, isect &res);
 
 // random related 
 extern std::default_random_engine _generator;
@@ -80,7 +80,7 @@ float random02Pi();
  & @param r1 random number (0, 1)
  & @param r2 random number (0, 1)
  */
-vec4 uniform_sample_hemis(const float &r1, const float &r2);
+__host__ __device__ vec4 uniform_sample_hemis(const float &r1, const float &r2);
 
 /**
  * @brief generate spherically uniform vector and return direction in xyz coord 
@@ -89,14 +89,14 @@ vec4 uniform_sample_hemis(const float &r1, const float &r2);
  * @param r2 random number (0, 1)
  * @return vec4 
  */
-vec4 uniform_sample_sphere(const float &r1, const float &r2);
+__host__ __device__ vec4 uniform_sample_sphere(const float &r1, const float &r2);
 
 /** 
  * generates a matrix that transforms the vector generated in uniform_sample_hemis
  * from sample coord to world coord. 
  * @param N normal vector 
  */
-mat44 create_sample_coord(const vec4 &N);
+__host__ __device__ mat44 create_sample_coord(const vec4 &N);
 
 
 

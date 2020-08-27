@@ -1,16 +1,16 @@
 #include "maths.h"
 
-void clamp(float& x) {
+__host__ __device__ void clamp(float& x) {
     x = std::clamp(x, 0.f, 1.f);
 }
 
-void clamp(vec3& x) {
+__host__ __device__ void clamp(vec3& x) {
     clamp(x.x);
     clamp(x.y);
     clamp(x.z);
 }
 
-bool quadratic_solve(double a, double b, double c, float &x0, float &x1) {
+__host__ __device__ bool quadratic_solve(double a, double b, double c, float &x0, float &x1) {
     float discr = b * b - 4 * a * c; 
     if (discr < 0) return false; 
     else if (discr == 0) { 
@@ -27,13 +27,13 @@ bool quadratic_solve(double a, double b, double c, float &x0, float &x1) {
     return true; 
 }
 
-void isect_init(isect &i) {
+__host__ __device__ void isect_init(isect &i) {
     i.inear = std::numeric_limits<float>::max(); 
     i.o = NULL; 
 }
 
 // returns true if intersection detected
-bool ray_sphere_intersect(ray *r, sphere *s, float &inear) {
+__host__ __device__ bool ray_sphere_intersect(ray *r, sphere *s, float &inear) {
     float t0, t1; 
     vec4 L = r->src; 
     vec4_sub(&L, &s->pos); 
@@ -60,7 +60,7 @@ bool ray_sphere_intersect(ray *r, sphere *s, float &inear) {
  * Möller–Trumbore intersection algorithm
  * https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
  */
-bool ray_trig_intersect(ray *r, const trig *trig, float &inear, float &u, float &v) {
+__host__ __device__ bool ray_trig_intersect(ray *r, const trig *trig, float &inear, float &u, float &v) {
     vec4 v0v1 = *trig->v1_trans;
     vec4_sub(&v0v1, trig->v0_trans);
     vec4 v0v2 = *trig->v2_trans;
@@ -100,7 +100,7 @@ bool ray_trig_intersect(ray *r, const trig *trig, float &inear, float &u, float 
     }
 } 
 
-bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint &trig_index) {
+__host__ __device__ bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint &trig_index) {
     bool ret = false; 
     for (uint i = 0; i < o->num_polygons; i++) {
         const trig *t = o->tlist[i]; 
@@ -118,7 +118,7 @@ bool ray_trig_mesh_intersect(ray *r, trig_mesh *o, float &res, vec2 &uv, uint &t
     return ret; 
 }
 
-bool trace(ray *r, const std::vector<obj*> &obj_list, isect &res) {
+__host__ __device__ bool trace(ray *r, const std::vector<obj*> &obj_list, isect &res) {
     isect_init(res);
 
     // why this performs better with openmp? 
@@ -183,7 +183,7 @@ float random02Pi() {
     return dist02Pi(generators[omp_get_thread_num()]);
 }
 
-vec4 uniform_sample_hemis(const float &r1, const float &r2) {
+__host__ __device__ vec4 uniform_sample_hemis(const float &r1, const float &r2) {
     // cos(theta) = r1 = y 
     // cos^2(theta) + sin^2(theta) = 1 -> sin(theta) = srtf(1 - cos^2(theta))
     float sinTheta = sqrtf(1 - r1 * r1); 
@@ -193,7 +193,7 @@ vec4 uniform_sample_hemis(const float &r1, const float &r2) {
     return {x, r1, z, 1.0}; 
 } 
 
-vec4 uniform_sample_sphere(const float &r1, const float &r2) {
+__host__ __device__ vec4 uniform_sample_sphere(const float &r1, const float &r2) {
     float cosTheta = cosf(r1); 
     float sinTheta = sqrtf(1 - r1 * r1); 
     float phi = 2 * PI * r2; 
@@ -202,7 +202,7 @@ vec4 uniform_sample_sphere(const float &r1, const float &r2) {
     return {x, cosTheta, z, 1.0};
 }
 
-mat44 create_sample_coord(const vec4 &N) 
+__host__ __device__ mat44 create_sample_coord(const vec4 &N) 
 { 
     vec4 Nt, Nb;
     if (std::fabs(N.x) > std::fabs(N.y)) {

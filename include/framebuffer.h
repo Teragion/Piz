@@ -9,8 +9,12 @@ struct framebuffer {
     uint width, height;
     unsigned char *color_buffer;
     float *depth_buffer;
+
+    framebuffer(int width, int height); 
+    ~framebuffer(); 
 };
 
+// depracated
 framebuffer* framebuffer_create(int width, int height); 
 void framebuffer_release(framebuffer *fb); 
 
@@ -21,7 +25,7 @@ void framebuffer_ccolor(framebuffer *fb, vec4 color);
 void framebuffer_cdepth(framebuffer *fb, float depth); 
 
 void blit_bgr(framebuffer *src, image *dst); 
-void blit_rgb(framebuffer* src, image* dst);
+void blit_rgb(framebuffer *src, image* dst);
 void blit_rgba(framebuffer *src, image *dst);
 
 #endif

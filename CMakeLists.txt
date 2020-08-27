@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(Piz LANGUAGES CXX)
+project(Piz LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -25,18 +25,18 @@ set(HEADERS
 )
 
 set(SOURCES 
-    src/camera.cpp
-    src/draw.cpp
-    src/framebuffer.cpp
-    src/image.cpp
-    src/material.cpp
-    src/maths.cpp
-    src/matrix.cpp
-    src/object.cpp
-    src/pathtracer.cpp
-    src/plane.cpp
-    src/scene.cpp
-    src/vector.cpp
+    src/camera.cu
+    src/draw.cu
+    src/framebuffer.cu
+    src/image.cu
+    src/material.cu
+    src/maths.cu
+    src/matrix.cu
+    src/object.cu
+    src/pathtracer.cu
+    src/plane.cu
+    src/scene.cu
+    src/vector.cu
 )
 
 if(WIN32)
@@ -51,8 +51,8 @@ add_library(common INTERFACE)
 
 # set(TARGET Demo_Interactive Demo_PathTracer)
 
-add_executable(Demo_Interactive ${HEADERS} ${SOURCES} src/demo.cpp)
-add_executable(Demo_PathTracer ${HEADERS} ${SOURCES} src/demo_pathtracer.cpp)
+add_executable(Demo_Interactive ${HEADERS} ${SOURCES} src/demo.cu)
+add_executable(Demo_PathTracer ${HEADERS} ${SOURCES} src/demo_pathtracer.cu)
 
 target_include_directories(Demo_Interactive PUBLIC include)
 target_include_directories(Demo_PathTracer PUBLIC include)

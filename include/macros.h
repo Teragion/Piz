@@ -1,6 +1,10 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#include <cuda.h>
+#include <device_launch_parameters.h>
+#include <device_functions.h>
+
 typedef unsigned int uint; 
 
 // Expression comparison 

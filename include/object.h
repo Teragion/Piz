@@ -31,7 +31,7 @@ struct obj {
 
     std::shared_ptr<material> obj_mat; 
 
-    obj() : id(0), 
+    __host__ __device__ obj() : id(0),
         name("unamed"),
         state(0),
         type(POLYHEDRON),
@@ -42,9 +42,9 @@ struct obj {
         pos({0, 0, 0, 1}),
         obj_mat(nullptr) {}
     
-    mat44 build_trans_mat();
+    __host__ __device__ mat44 build_trans_mat();
 
-    virtual illum_type get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out) {
+    __host__ __device__ virtual illum_type get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out) {
         return TRANSPARENT;
     } 
 };
@@ -61,7 +61,7 @@ struct polyhed : obj{
 
     std::vector<polygon*> plist; // maybe use unique pointers here? 
 
-    polyhed() : num_vertices(0),
+    __host__ __device__ polyhed() : num_vertices(0),
         num_polygons(0) {}
 
     void init(); 
@@ -77,13 +77,13 @@ struct polyhed : obj{
 struct trig_mesh : polyhed {
     std::vector<trig*> tlist; // maybe use unique pointers here? 
 
-    trig_mesh() {
+    __host__ __device__ trig_mesh() {
         type = TRIG_MESH;
     }
 
-    void init_trig(); 
+    __host__ __device__ void init_trig();
 
-    void add_trig(int v0, int v1, int v2);
+    __host__ __device__ void add_trig(int v0, int v1, int v2);
 
     /**
      * @param m 
@@ -92,18 +92,18 @@ struct trig_mesh : polyhed {
      * @param v2 bot left 
      * @param v3 bot right 
      */
-    void add_rect(int v0, int v1, int v2, int v3); 
-    virtual illum_type get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out); 
+    __host__ __device__ void add_rect(int v0, int v1, int v2, int v3);
+    __host__ __device__ virtual illum_type get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out);
 };
 
 struct sphere : obj{
     float radius; 
 
-    sphere() {
+    __host__ __device__ sphere() {
         type = SPHERE; 
     }
     
-    virtual illum_type get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out); 
+    __host__ __device__ virtual illum_type get_surface(vec4 *i_pnt, vec2 uv, uint trig_index, vec4 &normal, color &albedo_out);
 
 };
 

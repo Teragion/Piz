@@ -6,6 +6,29 @@
 #include "macros.h"
 #include "maths.h"
 
+framebuffer::framebuffer(int width, int height) { 
+    assert(width > 0 && height > 0); 
+
+    uint cbuffer_size = width * height * 4; 
+    uint dbuffer_size = sizeof(float) * width * height;
+
+    vec4 default_color = {0, 0, 0, 1}; 
+    float default_depth = 1.0; 
+
+    width = width; 
+    height = height; 
+    color_buffer = (unsigned char*)malloc(cbuffer_size); 
+    depth_buffer = (float*)malloc(dbuffer_size);  
+
+    framebuffer_ccolor(this, default_color);
+    framebuffer_cdepth(this, default_depth);
+}
+
+framebuffer::~framebuffer() {
+    free(color_buffer);
+    free(depth_buffer);
+}
+
 framebuffer* framebuffer_create(int width, int height) {
     assert(width > 0 && height > 0); 
 

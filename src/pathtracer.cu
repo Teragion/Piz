@@ -141,7 +141,7 @@ color send_light(ray *r, const std::vector<obj*> &obj_list, const std::vector<li
  * @param height viewport height 
  * @param fb framebuffer
  */
-void pathtracer_paint(const std::vector<obj*> obj_list, const std::vector<light*> light_list, float fov, uint width, uint height, framebuffer *fb) {
+__global__ void pathtracer_paint(const std::vector<obj*> obj_list, const std::vector<light*> light_list, float fov, uint width, uint height, framebuffer *fb) {
     omp_set_num_threads(OMP_NUM_THREADS);
     const float scale = tanf(DEG_TO_RAD(fov) / 2);
     const float scale_factor = 1.0; 
@@ -150,7 +150,9 @@ void pathtracer_paint(const std::vector<obj*> obj_list, const std::vector<light*
 
     int completed = 0;
 
-#pragma omp parallel for  
+    int row = threadIdx.x; 
+    int col = threadIdx.y; 
+
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             ray r;
@@ -174,10 +176,8 @@ void pathtracer_paint(const std::vector<obj*> obj_list, const std::vector<light*
 
             gamma_correct(sum);
 
-#pragma omp critical
             draw_point(col, row, sum, fb);
         }
-#pragma omp atomic 
         completed++; 
 
         float cur_time = platform_get_time();
